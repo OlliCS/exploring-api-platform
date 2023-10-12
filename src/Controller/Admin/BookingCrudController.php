@@ -48,10 +48,6 @@ class BookingCrudController extends AbstractCrudController
         else{
             $this->addFlash('success', $bookingResponse->getMessage());
         }
-
-
-
-
     }
     public function configureFields(string $pageName): iterable
     {
