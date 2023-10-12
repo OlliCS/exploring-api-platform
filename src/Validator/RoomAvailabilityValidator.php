@@ -4,9 +4,10 @@ namespace App\Validator;
 
 use DateTime;
 use App\Response\RoomAvailabilityResponse;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
-class RoomAvailabilityValidator 
-{
+class RoomAvailabilityValidator {
     private DateTime $startDate;
     private DateTime $endDate;
     private $bookings;

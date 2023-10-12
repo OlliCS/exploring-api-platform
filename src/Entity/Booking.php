@@ -2,22 +2,19 @@
 
 namespace App\Entity;
 
-use DateTimeZone;
-use DateTimeImmutable;
 use DateTimeInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
+
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BookingRepository;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
@@ -27,8 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     new GetCollection(),
     new Post(),
     new Put(),
-    //new Patch(),
-    new Delete()]
+    new Delete()],
 )]
 class Booking
 {
@@ -38,12 +34,16 @@ class Booking
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ApiFilter(DateFilter::class, properties: ['start_date'])]
-    private ?DateTimeInterface $start_date = null;
+    #[ApiFilter(DateFilter::class, properties: ['startDate'])]
+
+    #[Groups(['booking:read'])]
+    private ?DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ApiFilter(DateFilter::class, properties: ['end_date'])]
-    private ?DateTimeInterface $end_date = null;
+    #[ApiFilter(DateFilter::class, properties: ['endDate'])]
+
+     
+    private ?DateTimeInterface $endDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
@@ -52,10 +52,10 @@ class Booking
     private ?string $duration = null;
 
 
-    public function __construct($start_date,$end_date,$room)
+    public function __construct($startDate,$endDate,$room)
     {
-        $this->start_date = $start_date;
-        $this->end_date = $end_date;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
         $this->room = $room;
 
     }
@@ -68,24 +68,23 @@ class Booking
 
     public function getStartDate(): ?DateTimeInterface
     {
-        return $this->start_date->setTimezone(new DateTimeZone('Europe/Amsterdam'));
+        return $this->startDate;
     }
 
-    public function setStartDate(DateTimeInterface $start_date): static
+    public function setStartDate(DateTimeInterface $startDate): static
     {
-        $this->start_date = $start_date->setTimezone(new DateTimeZone('Europe/Amsterdam'));
-
+        $this->startDate = $startDate;
         return $this;
     }
 
     public function getEndDate(): ?DateTimeInterface
     {
-        return $this->end_date->setTimezone(new DateTimeZone('Europe/Amsterdam'));
+        return $this->endDate;
     }
 
-    public function setEndDate(DateTimeInterface $end_date): static
+    public function setEndDate(DateTimeInterface $endDate): static
     {
-        $this->end_date = $end_date->setTimezone(new DateTimeZone('Europe/Amsterdam'));
+        $this->endDate = $endDate;
 
         return $this;
     }

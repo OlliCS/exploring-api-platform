@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Room;
 use App\Entity\Booking;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Booking>
@@ -20,6 +21,31 @@ class BookingRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Booking::class);
     }
+
+    public function isRoomAvailable(Room $room, $startDate, $endDate): bool
+    {
+        $queryBuilder = $this->createQueryBuilder('b');
+
+        $queryBuilder->select('COUNT(b.id)')
+            ->where('b.room = :room')
+            ->andWhere('b.startDate <= :endDate')
+            ->andWhere('b.endDate >= :startDate')
+            ->setParameter('room', $room)
+            ->setParameter('start_date', $startDate)
+            ->setParameter('end_date', $endDate)
+            ;
+
+        $result = $queryBuilder->getQuery()->getSingleScalarResult();
+
+        return $result == 0;
+    }
+
+
+
+
+
+
+
 
 //    /**
 //     * @return Booking[] Returns an array of Booking objects
