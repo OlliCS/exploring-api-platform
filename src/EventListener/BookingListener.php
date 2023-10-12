@@ -2,9 +2,10 @@
 
 namespace App\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Exception;
 use App\Entity\Booking;
 use App\Service\BookingService;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 
 class BookingListener
 {
@@ -21,15 +22,15 @@ class BookingListener
 
         if ($entity instanceof Booking) {
 
-            $timeSlotValid = $this->bookingService->isRoomAvailable(
+            $bookingResponse = $this->bookingService->createBooking(
                 $entity->getRoom(),
                 $entity->getStartDate(),
                 $entity->getEndDate()
             );
 
-            if (!$timeSlotValid->isSuccess()) {
+            if (!$bookingResponse->isSuccess()) {
                 // Handle the error, e.g., throw an exception
-                throw new \Exception('The booking is not valid: ' . $timeSlotValid->getMessage() . '.');
+                throw new Exception('The booking is not valid: ' . $bookingResponse->getMessage() . '.');
             }
         }
     }
