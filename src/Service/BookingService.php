@@ -18,33 +18,17 @@ class BookingService
         $this->entityManager = $entityManager;
     }
 
-    public function createBooking(Room $room, DateTime $startDate, DateTime $endDate): BookingResponse
-    {
-        try{
-            $timeSlotValidator = $this->isRoomAvailable($room, $startDate, $endDate);
 
-            if (!$timeSlotValidator->isSuccess()) {
-                return new BookingResponse(null, false, $timeSlotValidator->getMessage());
-            }
-
-            $booking = new Booking();
-            $booking->setRoom($room);
-            $booking->setStartDate($startDate);
-            $booking->setEndDate($endDate);
-    
-            $this->entityManager->persist($booking);
-            $this->entityManager->flush();
-    
-            return new BookingResponse($booking, true, 'The booking has been created.');
-            
-        }
-        catch (Exception $e) {
-            return new BookingResponse(null, false, $e->getMessage());
-        }
-    }
 
     public function isRoomAvailable(Room $room, DateTime $startDate, DateTime $endDate): TimeSlotValidatorResponse
     {
+        $now = new DateTime();
+        if ($startDate < $now || $endDate < $now) {
+            return new TimeSlotValidatorResponse(false, 
+                "Invalid time slot. Start date and end date must be in the future."
+            );
+        }
+
         if (!$this->isStartDateBeforeEndDate($startDate, $endDate)) {
             return new TimeSlotValidatorResponse(false, 'The time slot is not valid: start date must be before end date.');
         }
@@ -82,6 +66,41 @@ class BookingService
     public function isStartDateBeforeEndDate($startDate, $endDate): bool
     {
         return $endDate > $startDate;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    public function createBooking(Room $room, DateTime $startDate, DateTime $endDate): BookingResponse
+    {
+        try{
+            $timeSlotValidator = $this->isRoomAvailable($room, $startDate, $endDate);
+
+            if (!$timeSlotValidator->isSuccess()) {
+                return new BookingResponse(null, false, $timeSlotValidator->getMessage());
+            }
+
+            $booking = new Booking();
+            $booking->setRoom($room);
+            $booking->setStartDate($startDate);
+            $booking->setEndDate($endDate);
+    
+            $this->entityManager->persist($booking);
+            $this->entityManager->flush();
+    
+            return new BookingResponse($booking, true, 'The booking has been created.');
+            
+        }
+        catch (Exception $e) {
+            return new BookingResponse(null, false, $e->getMessage());
+        }
     }
 }
 
