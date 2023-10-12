@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use DateTimeZone;
+use DateTimeImmutable;
 use DateTimeInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
@@ -47,11 +49,14 @@ class Booking
     #[ORM\JoinColumn(nullable: false)]
     private ?Room $room = null;
 
+
+
     public function __construct($start_date,$end_date,$room)
     {
         $this->start_date = $start_date;
         $this->end_date = $end_date;
         $this->room = $room;
+
     }
 
 
@@ -62,24 +67,24 @@ class Booking
 
     public function getStartDate(): ?DateTimeInterface
     {
-        return $this->start_date;
+        return $this->start_date->setTimezone(new DateTimeZone('Europe/Amsterdam'));
     }
 
     public function setStartDate(DateTimeInterface $start_date): static
     {
-        $this->start_date = $start_date;
+        $this->start_date = $start_date->setTimezone(new DateTimeZone('Europe/Amsterdam'));
 
         return $this;
     }
 
     public function getEndDate(): ?DateTimeInterface
     {
-        return $this->end_date;
+        return $this->end_date->setTimezone(new DateTimeZone('Europe/Amsterdam'));
     }
 
     public function setEndDate(DateTimeInterface $end_date): static
     {
-        $this->end_date = $end_date;
+        $this->end_date = $end_date->setTimezone(new DateTimeZone('Europe/Amsterdam'));
 
         return $this;
     }
