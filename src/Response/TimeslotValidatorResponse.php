@@ -8,7 +8,7 @@ class TimeSlotValidatorResponse
 {
     private bool $success;
     private string $message;
-    private function __construct( bool $success, string $message)
+    public function __construct( bool $success, string $message)
     {
         $this->success = $success;
         $this->message = $message;
