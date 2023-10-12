@@ -18,6 +18,7 @@ use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
+
 #[ApiResource(description:'A booking for a room.' ,
    operations: [
     new Get(),
@@ -68,23 +69,23 @@ class Booking
 
     public function getStartDate(): ?DateTimeInterface
     {
-        return $this->startDate;
+        return $this->startDate->setTimezone(new \DateTimeZone('Europe/Amsterdam'));
     }
 
     public function setStartDate(DateTimeInterface $startDate): static
     {
-        $this->startDate = $startDate;
+        $this->startDate = $startDate->setTimezone(new \DateTimeZone('Europe/Amsterdam'));
         return $this;
     }
 
     public function getEndDate(): ?DateTimeInterface
     {
-        return $this->endDate;
+        return $this->endDate->setTimezone(new \DateTimeZone('Europe/Amsterdam'));
     }
 
     public function setEndDate(DateTimeInterface $endDate): static
     {
-        $this->endDate = $endDate;
+        $this->endDate = $endDate->setTimezone(new \DateTimeZone('Europe/Amsterdam'));
 
         return $this;
     }
