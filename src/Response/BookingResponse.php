@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Response;
+
+use App\Entity\Booking;
 
 class BookingResponse
 {
