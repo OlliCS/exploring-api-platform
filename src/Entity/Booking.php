@@ -47,6 +47,13 @@ class Booking
     #[ORM\JoinColumn(nullable: false)]
     private ?Room $room = null;
 
+    public function __construct()
+    {
+        $this->start_date = new \DateTime();
+        $this->end_date = new \DateTime();
+        
+    }
+
 
     public function getId(): ?int
     {
@@ -87,6 +94,11 @@ class Booking
         $this->room = $room;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getRoom()->getName();
     }
 
 
