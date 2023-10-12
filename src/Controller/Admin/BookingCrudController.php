@@ -15,6 +15,12 @@ class BookingCrudController extends AbstractCrudController
     {
         return Booking::class;
     }
+    public function createEntity(string $entityFqcn)
+    {
+        $booking = new Booking(new \DateTime(),new \DateTime(),null);
+        return $booking;
+
+    }
 
     
     public function configureFields(string $pageName): iterable
