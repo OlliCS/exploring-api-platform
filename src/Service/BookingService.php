@@ -3,14 +3,13 @@
 namespace App\Service;
 use DateTime;
 use Exception;
-use DateInterval;
 use App\Entity\Room;
 use App\Entity\Booking;
 use App\Response\BookingResponse;
 use App\Validator\TimeSlotValidator;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Response\RoomAvailabilityResponse;
-use App\Response\TimeSlotValidatorResponse;
+use App\Validator\RoomAvailabilityValidator;
 
 class BookingService 
 {
@@ -42,11 +41,9 @@ class BookingService
         }
     }
 
-
-
-    public function checkRoomAvailability(Room $room, DateTime $startDate, DateTime $endDate): RoomAvailabilityResponse
+    private function checkRoomAvailability(Room $room, DateTime $startDate, DateTime $endDate): RoomAvailabilityResponse
     {
-        //validate the time slot
+        //validate the time slot is valid
         $timeSlotValidator = new TimeSlotValidator($startDate, $endDate);
         $timeSlotValidResponse = $timeSlotValidator->validate();
 
@@ -54,48 +51,21 @@ class BookingService
             return new RoomAvailabilityResponse(false, $timeSlotValidResponse->getMessage());
         }
 
+        //check if the room is available
         $bookings = $this->entityManager->getRepository(Booking::class)->findBy(['room' => $room]);
-
-        foreach ($bookings as $booking) {
-            $existingStart = $booking->getStartDate()->format('Y-m-d H:i:s');
-            $existingEnd = $booking->getEndDate()->format('Y-m-d H:i:s');
-            $desiredStart = $startDate->format('Y-m-d H:i:s');
-            $desiredEnd = $endDate->format('Y-m-d H:i:s');
-        
-            if ($startDate >= $booking->getStartDate() && $startDate <= $booking->getEndDate()) {
-                return new RoomAvailabilityResponse(false, 
-                    "Conflict with an existing booking ($existingStart to $existingEnd). " .
-                    "The desired start date ($desiredStart) is within this range."
-                );
-            }
-            if ($endDate >= $booking->getStartDate() && $endDate <= $booking->getEndDate()) {
-                return new RoomAvailabilityResponse(false, 
-                    "Conflict with an existing booking ($existingStart to $existingEnd). " .
-                    "The desired end date ($desiredEnd) is within this range."
-                );
-            }
-            if ($startDate <= $booking->getStartDate() && $endDate >= $booking->getEndDate()) {
-                return new RoomAvailabilityResponse(false, 
-                    "Conflict with an existing booking ($existingStart to $existingEnd). " .
-                    "The desired time slot ($desiredStart to $desiredEnd) envelops this booking."
-                );
-            }
+        if($bookings === null) {
+            return new RoomAvailabilityResponse(true, 'The room has no bookings so the room is available.');
         }
+
+        $roomAvailabilityValidator = new RoomAvailabilityValidator($startDate, $endDate, $bookings);
+        $roomAvailabilityValidResponse = $roomAvailabilityValidator->validate();
+
+        if (!$roomAvailabilityValidResponse->isSuccess()) {
+            return new RoomAvailabilityResponse(false, $roomAvailabilityValidResponse->getMessage());
+        }
+
         return new RoomAvailabilityResponse(true, 'The room is available.');
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 
