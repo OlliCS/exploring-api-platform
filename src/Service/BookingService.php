@@ -3,6 +3,7 @@
 namespace App\Service;
 use DateTime;
 use Exception;
+use DateInterval;
 use App\Entity\Room;
 use App\Entity\Booking;
 use App\Response\BookingResponse;
@@ -18,17 +19,56 @@ class BookingService
         $this->entityManager = $entityManager;
     }
 
+    public function createBooking(Room $room, DateTime $startDate, DateTime $endDate): BookingResponse
+    {
+        try{
+            $timeSlotValidator = $this->isRoomAvailable($room, $startDate, $endDate);
+
+            if (!$timeSlotValidator->isSuccess()) {
+                return new BookingResponse(null, false, $timeSlotValidator->getMessage());
+            }
+
+            $booking = new Booking($startDate, $endDate, $room);
+            $this->entityManager->persist($booking);
+            $this->entityManager->flush();
+    
+            return new BookingResponse($booking, true, 'The booking has been created.');
+            
+        }
+        catch (Exception $e) {
+            return new BookingResponse(null, false, $e->getMessage());
+        }
+    }
+
 
 
     public function isRoomAvailable(Room $room, DateTime $startDate, DateTime $endDate): TimeSlotValidatorResponse
     {
-        $now = new DateTime();
-        if ($startDate < $now || $endDate < $now) {
-            return new TimeSlotValidatorResponse(false, 
-                "Invalid time slot. Start date and end date must be in the future."
-            );
-        }
 
+        $maxBookingDurationInSeconds = 12 * 60 * 60; // 12 hours
+        $now = new DateTime();
+
+        if ($startDate < $now || $endDate < $now) {
+            $invalidDates = [];
+        
+            if($startDate < $now) {
+                $invalidDates[] = "start date {$startDate->format('Y-m-d H:i:s')}";
+            }
+            if($endDate < $now) {
+                $invalidDates[] = "end date {$endDate->format('Y-m-d H:i:s')}";
+            }
+        
+            $invalidDatesString = implode(' and ', $invalidDates);
+            $errorMessage = "Invalid time slot. The {$invalidDatesString} must be in the future.";
+        
+            return new TimeSlotValidatorResponse(false, $errorMessage);
+        }
+        $bookingDurationInSeconds = $endDate->getTimestamp() - $startDate->getTimestamp();
+            if ($bookingDurationInSeconds > $maxBookingDurationInSeconds) {
+                return new TimeSlotValidatorResponse(false, 
+                    "Invalid booking duration. You cannot book the room for more than 12 hours."
+                );
+            }
         if (!$this->isStartDateBeforeEndDate($startDate, $endDate)) {
             return new TimeSlotValidatorResponse(false, 'The time slot is not valid: start date must be before end date.');
         }
@@ -78,28 +118,7 @@ class BookingService
 
 
 
-    public function createBooking(Room $room, DateTime $startDate, DateTime $endDate): BookingResponse
-    {
-        try{
-            $timeSlotValidator = $this->isRoomAvailable($room, $startDate, $endDate);
 
-            if (!$timeSlotValidator->isSuccess()) {
-                return new BookingResponse(null, false, $timeSlotValidator->getMessage());
-            }
-
-            $booking = new Booking($startDate, $endDate, $room);
-
-    
-            $this->entityManager->persist($booking);
-            $this->entityManager->flush();
-    
-            return new BookingResponse($booking, true, 'The booking has been created.');
-            
-        }
-        catch (Exception $e) {
-            return new BookingResponse(null, false, $e->getMessage());
-        }
-    }
 }
 
 
