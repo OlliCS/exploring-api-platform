@@ -47,11 +47,11 @@ class Booking
     #[ORM\JoinColumn(nullable: false)]
     private ?Room $room = null;
 
-    public function __construct()
+    public function __construct($start_date,$end_date,$room)
     {
-        $this->start_date = new \DateTime();
-        $this->end_date = new \DateTime();
-        
+        $this->start_date = $start_date;
+        $this->end_date = $end_date;
+        $this->room = $room;
     }
 
 
