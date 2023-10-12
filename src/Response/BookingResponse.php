@@ -9,7 +9,7 @@ class BookingResponse
     private ?Booking $booking;
     private bool $success;
     private string $message;
-    private function __construct(?Booking $booking, bool $success, string $message)
+    public function __construct(?Booking $booking, bool $success, string $message)
     {
         $this->booking = $booking;
         $this->success = $success;
