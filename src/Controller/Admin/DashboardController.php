@@ -22,7 +22,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Exploring Api Platform');
+            ->setTitle('Admin Panel');
     }
 
     public function configureMenuItems(): iterable
