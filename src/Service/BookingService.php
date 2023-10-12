@@ -87,10 +87,8 @@ class BookingService
                 return new BookingResponse(null, false, $timeSlotValidator->getMessage());
             }
 
-            $booking = new Booking();
-            $booking->setRoom($room);
-            $booking->setStartDate($startDate);
-            $booking->setEndDate($endDate);
+            $booking = new Booking($startDate, $endDate, $room);
+
     
             $this->entityManager->persist($booking);
             $this->entityManager->flush();
