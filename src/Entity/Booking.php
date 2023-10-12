@@ -49,6 +49,7 @@ class Booking
     #[ORM\JoinColumn(nullable: false)]
     private ?Room $room = null;
 
+    private ?string $duration = null;
 
 
     public function __construct($start_date,$end_date,$room)
@@ -99,6 +100,12 @@ class Booking
         $this->room = $room;
 
         return $this;
+    }
+
+    public function getDuration(): ?string
+    {
+        $this->duration = $this->getStartDate()->diff($this->getEndDate())->format('%h hours %i minutes');
+        return $this->duration;
     }
 
     public function __toString(): string
