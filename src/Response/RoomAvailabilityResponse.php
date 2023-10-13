@@ -4,7 +4,7 @@ namespace App\Response;
 
 use App\Entity\Booking;
 
-class RoomAvailabilityResponse extends ResponseModel
+class RoomAvailabilityResponse extends BaseResponse
 {
     public function __construct( bool $success, string $message)
     {        

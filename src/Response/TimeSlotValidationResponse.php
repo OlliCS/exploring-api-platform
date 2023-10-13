@@ -3,7 +3,7 @@
 namespace App\Response;
 
 
-class TimeSlotValidationResponse extends ResponseModel
+class TimeSlotValidationResponse extends BaseResponse
 {
     public function __construct( bool $success, string $message)
     {        

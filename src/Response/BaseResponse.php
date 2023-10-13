@@ -3,7 +3,7 @@
 namespace App\Response;
 
 
-abstract class ResponseModel
+abstract class BaseResponse
 {
     private bool $success;
     private string $message;
