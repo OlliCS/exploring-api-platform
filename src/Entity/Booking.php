@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeZone;
 use DateTimeInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
@@ -14,11 +16,14 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BookingRepository;
 use ApiPlatform\Metadata\GetCollection;
-use App\Validation\Constraints\RoomValidator;
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 
+use App\Validation\Constraints\RoomValidator;
+
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use App\Validator\Constraints as BookingAssert;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
 #[ApiResource(description:'A booking for a room.' ,
@@ -32,7 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => ['booking:write']],
 )]
 
-
+#[BookingAssert\RoomAvailabilityConstraint]
 class Booking
 {
     #[ORM\Id]
@@ -46,7 +51,7 @@ class Booking
 
     #[Groups(['booking:read', 'booking:write'])]
     #[ApiFilter(DateFilter::class, properties: ['startDate'])]
-    private ?DateTimeInterface $startDate = null;
+    private ?DateTime $startDate = null;
 
 
 
@@ -55,7 +60,7 @@ class Booking
     #[Assert\NotBlank(message: 'Fill in the end date')]
     #[Groups(['booking:read', 'booking:write'])]
     #[ApiFilter(DateFilter::class, properties: ['endDate'])]
-    private ?DateTimeInterface $endDate = null;
+    private ?DateTime $endDate = null;
 
 
 
@@ -87,23 +92,23 @@ class Booking
 
     public function getStartDate(): ?DateTimeInterface
     {
-        return $this->startDate->setTimezone(new \DateTimeZone('Europe/Amsterdam'));
+        return $this->startDate;
     }
 
-    public function setStartDate(DateTimeInterface $startDate): static
+    public function setStartDate(DateTime $startDate): static
     {
-        $this->startDate = $startDate->setTimezone(new \DateTimeZone('Europe/Amsterdam'));
+        $this->startDate = $startDate;
         return $this;
     }
 
     public function getEndDate(): ?DateTimeInterface
     {
-        return $this->endDate->setTimezone(new \DateTimeZone('Europe/Amsterdam'));
+        return $this->endDate;
     }
 
-    public function setEndDate(DateTimeInterface $endDate): static
+    public function setEndDate(DateTime $endDate): static
     {
-        $this->endDate = $endDate->setTimezone(new \DateTimeZone('Europe/Amsterdam'));
+        $this->endDate = $endDate;
 
         return $this;
     }

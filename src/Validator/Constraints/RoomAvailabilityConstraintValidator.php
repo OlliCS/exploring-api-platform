@@ -24,7 +24,7 @@ class RoomAvailabilityConstraintValidator extends ConstraintValidator
         $roomAvailabiltity = $this->bookingService->checkRoomAvailability($room, $startDate, $endDate);
 
         if (!$roomAvailabiltity->isSuccess()) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($constraint->responseMessage)
                 ->setParameter('{{ responseMessage }}', $roomAvailabiltity->getMessage())
                 ->addViolation();
         }
