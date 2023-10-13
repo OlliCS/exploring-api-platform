@@ -4,13 +4,13 @@ namespace App\Validator;
 
 use DateTime;
 use App\Response\RoomAvailabilityResponse;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
+
 
 class RoomAvailabilityValidator {
     private DateTime $startDate;
     private DateTime $endDate;
     private $bookings;
+    private const  DATEFORMAT = 'Y-m-d H:i';
 
     public function __construct(DateTime $startDate, DateTime $endDate, $bookings)
     {
@@ -21,57 +21,50 @@ class RoomAvailabilityValidator {
 
     public function validate() : RoomAvailabilityResponse
     {
-        $validation = $this->validateStartHourInExistingBooking();
-        if(!$validation->isSuccess()) {
-            return $validation;
+        $conflictingHoursValidation = $this->validateHourConflictsWithExistingBookings();
+        if(!$conflictingHoursValidation->isSuccess()) {
+            return $conflictingHoursValidation;
         }
 
-        $validation = $this->validateEndHourInExistingBooking();
-        if(!$validation->isSuccess()) {
-            return $validation;
-        }
-
-        $validation = $this->validateBookingIsNotOverlapping();
-        if(!$validation->isSuccess()) {
-            return $validation;
+        $overlapValidation = $this->validateBookingIsNotOverlapping();
+        if(!$overlapValidation->isSuccess()) {
+            return $overlapValidation;
         }
 
         return new RoomAvailabilityResponse(true, "The room is available");
-
     }
 
-    private function validateStartHourInExistingBooking() : RoomAvailabilityResponse
+    private function validateHourConflictsWithExistingBookings() : RoomAvailabilityResponse
     {
         foreach($this->bookings as $booking) {
             if($this->startDate >= $booking->getStartDate() && $this->startDate <= $booking->getEndDate()) {
-                return new RoomAvailabilityResponse(false, "The start date {$this->startDate->format('Y-m-d H:i')} is in the range of another booking, the booking starts at {$booking->getStartDate()->format('Y-m-d H:i')}");
+                return new RoomAvailabilityResponse(
+                    false,
+                    "The start date {$this->startDate->format(self::DATEFORMAT)} is in the range of another booking, {$this->createMessageOfConflictingBooking($booking)}");
             }
-        }
-        return new RoomAvailabilityResponse(true, "The start date {$this->startDate->format('Y-m-d H:i:s')} is available");
-    }
-
-    private function validateEndHourInExistingBooking() : RoomAvailabilityResponse
-    {
-        foreach($this->bookings as $booking) {
             if($this->endDate >= $booking->getStartDate() && $this->endDate <= $booking->getEndDate()) {
-                return new RoomAvailabilityResponse(false, "The end date {$this->endDate->format('Y-m-d H:i')} is in the range of another booking, the booking ends at {$booking->getEndDate()->format('Y-m-d H:i')}");
+                return new RoomAvailabilityResponse(
+                    false,
+                    "The end date {$this->endDate->format(self::DATEFORMAT)} is in the range of another booking, {$this->createMessageOfConflictingBooking($booking)}");
             }
         }
-        return new RoomAvailabilityResponse(true, "The end date {$this->endDate->format('Y-m-d H:i:s')} is available");
+        return new RoomAvailabilityResponse(true, "The start and end date are not in the range of another booking");
     }
 
     private function validateBookingIsNotOverlapping() : RoomAvailabilityResponse
     {
         foreach($this->bookings as $booking) {
             if($this->startDate <= $booking->getStartDate() && $this->endDate >= $booking->getEndDate()) {
-                return new RoomAvailabilityResponse(false, "The booking is overlapping with an existing booking, the booking starts at {$booking->getStartDate()->format('Y-m-d H:i')} and ends at {$booking->getEndDate()->format('Y-m-d H:i')}");
+                return new RoomAvailabilityResponse(false, "The booking is overlapping with an existing booking, {$this->createMessageOfConflictingBooking($booking)}");
             }
         }
         return new RoomAvailabilityResponse(true, "The booking is not overlapping with an existing booking");
     }
 
-
-
+    private function createMessageOfConflictingBooking($booking) : string
+    {
+        return "the booking starts at {$booking->getStartDate()->format(self::DATEFORMAT)} and ends at {$booking->getEndDate()->format(self::DATEFORMAT)}";
+    }
 }
 
 
