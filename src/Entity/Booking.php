@@ -29,6 +29,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Put(),
     new Delete()],
 )]
+
+/**
+ * @CustomAssert\RoomAvailabilityConstraint
+ */
 class Booking
 {
     #[ORM\Id]
