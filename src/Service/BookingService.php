@@ -41,7 +41,7 @@ class BookingService
         }
     }
 
-    private function checkRoomAvailability(Room $room, DateTime $startDate, DateTime $endDate): RoomAvailabilityResponse
+    public function checkRoomAvailability(Room $room, DateTime $startDate, DateTime $endDate): RoomAvailabilityResponse
     {
         //validate the time slot is valid
         $timeSlotValidator = new TimeSlotValidator($startDate, $endDate);
