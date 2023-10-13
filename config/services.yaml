@@ -26,3 +26,11 @@ services:
     App\EventListener\BookingListener:
         tags:
             - { name: 'doctrine_event_listener', event: 'prePersist' , connection: 'default' }
+
+
+    App\Validator\Constraints\RoomAvailabilityConstraintValidator:
+        arguments:
+            $bookingService: '@App\Service\BookingService'
+        tags:
+            - { name: validator.constraint_validator, alias: room_availability_class_validator }
+
