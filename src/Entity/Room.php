@@ -26,7 +26,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         new GetCollection(),
         new Post(),
         new Put(),
-        //new Patch(),
         new Delete()],
     normalizationContext: ['groups' => ['room:read']],
     denormalizationContext: ['groups' => ['room:write']],

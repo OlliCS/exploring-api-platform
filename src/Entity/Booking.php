@@ -2,22 +2,22 @@
 
 namespace App\Entity;
 
-use App\Validation\Constraints\RoomValidator;
 use DateTimeInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
+use Assert\TimeSlotValidator;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
-
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BookingRepository;
 use ApiPlatform\Metadata\GetCollection;
+use App\Validation\Constraints\RoomValidator;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use Symfony\Component\Serializer\Annotation\Groups;
 
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
@@ -28,11 +28,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Post(),
     new Put(),
     new Delete()],
+    normalizationContext: ['groups' => ['booking:read']],
+    denormalizationContext: ['groups' => ['booking:write']],
 )]
 
-/**
- * @CustomAssert\RoomAvailabilityConstraint
- */
 class Booking
 {
     #[ORM\Id]
@@ -41,31 +40,34 @@ class Booking
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ApiFilter(DateFilter::class, properties: ['startDate'])]
+    #[Assert\NotBlank]
+    #[Assert\GreaterThan('now')]
+    #[Assert\LessThan(propertyPath: 'endDate')]
 
-    #[Groups(['booking:read'])]
+    #[Groups(['booking:read', 'booking:write'])]
+    #[ApiFilter(DateFilter::class, properties: ['startDate'])]
     private ?DateTimeInterface $startDate = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ApiFilter(DateFilter::class, properties: ['endDate'])]
 
-    /**
-     * @Assert\NotBlank
-     * @Assert\DateTime
-     * @Assert\Expression(
-     *     "this.getStartDate() < this.getEndDate()",
-     *     message="The end date must be after the start date"
-     * )
-     */ 
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\GreaterThan(propertyPath: 'startDate')]
+    #[Assert\NotBlank]
+    #[Groups(['booking:read', 'booking:write'])]
+    #[ApiFilter(DateFilter::class, properties: ['endDate'])]
     private ?DateTimeInterface $endDate = null;
+
+
+
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
-    /**
-     * @Assert\NotBlank(message="Please select a room")
-     */ 
+    #[Assert\NotBlank]
+    #[Groups(['booking:read', 'booking:write'])]
+
     private ?Room $room = null;
 
+    #[Groups(['booking:read'])]
     private ?string $duration = null;
 
 
