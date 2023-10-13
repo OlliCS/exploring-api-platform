@@ -21,11 +21,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     description: 'Search for a room on a specific date and for a specific number of people.',
     operations: [
     new GetCollection(),
-    'pagination_enabled' => false,
     ]
 
 )]
 #[ApiFilter(NumericFilter::class, properties: ['people'])]
+#[ApiFilter(DateFilter::class, properties: ['date'])]
+
 
 class RoomSearcher
 {
@@ -44,7 +45,7 @@ class RoomSearcher
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\GreaterThan('now', message: 'Date must be in the future')]
     #[Assert\NotBlank(message: 'Fill in the date')]
-    #[ApiFilter(DateFilter::class, properties: ['date'])]
+
     private ?\DateTimeInterface $date = null;
 
     public function getId(): ?int
