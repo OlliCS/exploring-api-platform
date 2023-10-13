@@ -3,12 +3,15 @@
 namespace App\Validator;
 
 use DateTime;
-use App\Response\TimeSlotValidationResponse;
+use DateTimeZone;
+use App\Response\TimeSlotValidatorResponse;
 
 class TimeSlotValidator 
 {
     private DateTime $startDate;
     private DateTime $endDate;
+    private const  DATEFORMAT = 'Y-m-d H:i:s';
+    private const MAX_BOOKING_DURATION = 12; //hours
 
     public function __construct(DateTime $startDate, DateTime $endDate)
     {
@@ -16,7 +19,7 @@ class TimeSlotValidator
         $this->endDate = $endDate;
     }
 
-    public function validate() : TimeSlotValidationResponse
+    public function validate() : TimeSlotValidatorResponse
     {
         $validation = $this->validateDatesAreInTheFuture();
         if (!$validation->isSuccess()) {
@@ -31,42 +34,42 @@ class TimeSlotValidator
         return $this->validateDurationIsNotTooLong();
     }
 
-    private function validateDatesAreInTheFuture() : TimeSlotValidationResponse
+    private function validateDatesAreInTheFuture() : TimeSlotValidatorResponse
     {
-        $now = new DateTime();
+        $now = new DateTime(null, new DateTimeZone('Europe/Amsterdam'));
         $invalidDates = [];
     
         if($this->startDate < $now) {
-            $invalidDates[] = "start date {$this->startDate->format('Y-m-d H:i:s')}";
+            $invalidDates[] = "start date {$this->startDate->format(self::DATEFORMAT)}";
         }
     
         if($this->endDate < $now) {
-            $invalidDates[] = "end date {$this->endDate->format('Y-m-d H:i:s')}";
+            $invalidDates[] = "end date {$this->endDate->format(self::DATEFORMAT)}";
         }
 
         if(!empty($invalidDates)) {
-            return new TimeSlotValidationResponse(false, "Invalid dates: " . implode(', ', $invalidDates));
+            return new TimeSlotValidatorResponse(false, "Invalid dates: " . implode(', ', $invalidDates));
         }
-        return new TimeSlotValidationResponse(true, "Dates are in the future");
+        return new TimeSlotValidatorResponse(true, "Dates are in the future");
     }
 
-    private function validateStartDateIsBeforeEndDate() : TimeSlotValidationResponse
+    private function validateStartDateIsBeforeEndDate() : TimeSlotValidatorResponse
     {
         if ($this->startDate > $this->endDate) {
-            return new TimeSlotValidationResponse(false, "The start date {$this->startDate->format('Y-m-d H:i:s')} cannot be greater than the end date {$this->endDate->format('Y-m-d H:i:s')}");
+            return new TimeSlotValidatorResponse(false, "The start date {$this->startDate->format(self::DATEFORMAT)} cannot be greater than the end date {$this->endDate->format(self::DATEFORMAT)}");
         }
-        return new TimeSlotValidationResponse(true, "Start date is before end date");
+        return new TimeSlotValidatorResponse(true, "Start date is before end date");
     }
 
-    private function validateDurationIsNotTooLong() : TimeSlotValidationResponse
+    private function validateDurationIsNotTooLong() : TimeSlotValidatorResponse
     {
-        $maxBookingDurationInSeconds = 12 * 60 * 60; // 12 hours
+        $maxBookingDurationInSeconds = self::MAX_BOOKING_DURATION * 60 * 60; 
         $diffInSeconds = $this->endDate->getTimestamp() - $this->startDate->getTimestamp();
         
         if ($diffInSeconds > $maxBookingDurationInSeconds) {
-            return new TimeSlotValidationResponse(false, "The booking cannot be longer than 12 hours");
+            return new TimeSlotValidatorResponse(false, "The booking cannot be longer than 12 hours");
         }
 
-        return new TimeSlotValidationResponse(true, "The timeslot is valid");
+        return new TimeSlotValidatorResponse(true, "The timeslot is valid");
     }
 }
