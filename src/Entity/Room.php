@@ -13,7 +13,10 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 #[ApiResource(
@@ -24,25 +27,41 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Post(),
         new Put(),
         //new Patch(),
-        new Delete(),
-    ])]
+        new Delete()],
+    normalizationContext: ['groups' => ['room:read']],
+    denormalizationContext: ['groups' => ['room:write']],
+)]
+#[UniqueEntity(fields: ['name'])]
 class Room
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2, max: 50)]
+    #[Assert\Regex(pattern: '/^[a-zA-Z0-9]+$/')]
+
+    #[Groups(['room:read', 'room:write'])]
+
+
     private ?string $name = null;
 
     /**
      * The capacity of the room in number of people.
      */
     #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Assert\GreaterThan(0)]
+    #[Assert\LessThan(100)]
+    #[Groups(['room:read', 'room:write'])]
     private ?int $capacity = null;
 
     #[ORM\OneToMany(mappedBy: 'room', targetEntity: Booking::class, orphanRemoval: true)]
+    #[Groups(['room:read'])]
     private Collection $bookings;
 
 
@@ -51,6 +70,7 @@ class Room
     {
         $this->bookings = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
