@@ -3,11 +3,9 @@
 namespace App\Entity;
 
 use DateTime;
-use DateTimeZone;
 use DateTimeInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
-use Assert\TimeSlotValidator;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Delete;
@@ -16,11 +14,10 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BookingRepository;
 use ApiPlatform\Metadata\GetCollection;
-
-use App\Validation\Constraints\RoomValidator;
-
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use App\Validator\Constraints as BookingAssert;
+use ApiPlatform\Elasticsearch\Filter\TermFilter;
+use ApiPlatform\Elasticsearch\Filter\MatchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -38,6 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 
 #[BookingAssert\RoomAvailabilityConstraint]
+#[ApiFilter(TermFilter::class, properties: ['room'])]
 class Booking
 {
     #[ORM\Id]
@@ -45,10 +43,11 @@ class Booking
     #[ORM\Column]
     private ?int $id = null;
 
+
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: 'Fill in the start date')]
     #[Assert\GreaterThan('now', message: 'Start date must be in the future')]
-
     #[Groups(['booking:read', 'booking:write'])]
     #[ApiFilter(DateFilter::class, properties: ['startDate'])]
     private ?DateTime $startDate = null;
