@@ -18,6 +18,12 @@ class RoomCrudController extends AbstractCrudController
         return Room::class;
     }
 
+    public function createEntity(string $entityFqcn)
+    {
+       $room = new Room(null,0);
+         return $room;
+    }
+
 
 
     /*
