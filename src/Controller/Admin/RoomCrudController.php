@@ -18,6 +18,8 @@ class RoomCrudController extends AbstractCrudController
         return Room::class;
     }
 
+
+
     /*
     public function configureFields(string $pageName): iterable
     {
@@ -34,7 +36,7 @@ class RoomCrudController extends AbstractCrudController
         yield IdField::new('id')->hideOnForm();
         yield TextField::new('name')->setColumns(8);
         yield IntegerField::new('capacity')->setColumns(8);
-        yield AssociationField::new('bookings')->setColumns(8);
+        yield AssociationField::new('bookings')->setColumns(8)->hideOnForm();
 
     }
 }
