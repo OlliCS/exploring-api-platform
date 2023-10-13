@@ -44,7 +44,7 @@ class RoomAvailabilityValidator {
     {
         foreach($this->bookings as $booking) {
             if($this->startDate >= $booking->getStartDate() && $this->startDate <= $booking->getEndDate()) {
-                return new RoomAvailabilityResponse(false, "The start date {$this->startDate->format('Y-m-d H:i:s')} is already booked");
+                return new RoomAvailabilityResponse(false, "The start date {$this->startDate->format('Y-m-d H:i')} is in the range of another booking");
             }
         }
         return new RoomAvailabilityResponse(true, "The start date {$this->startDate->format('Y-m-d H:i:s')} is available");
@@ -54,7 +54,7 @@ class RoomAvailabilityValidator {
     {
         foreach($this->bookings as $booking) {
             if($this->endDate >= $booking->getStartDate() && $this->endDate <= $booking->getEndDate()) {
-                return new RoomAvailabilityResponse(false, "The end date {$this->endDate->format('Y-m-d H:i:s')} is already booked");
+                return new RoomAvailabilityResponse(false, "The end date {$this->endDate->format('Y-m-d H:i')} is in the range of another booking");
             }
         }
         return new RoomAvailabilityResponse(true, "The end date {$this->endDate->format('Y-m-d H:i:s')} is available");
