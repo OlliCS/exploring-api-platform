@@ -32,6 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => ['booking:write']],
 )]
 
+
 class Booking
 {
     #[ORM\Id]
@@ -40,9 +41,8 @@ class Booking
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\NotBlank]
-    #[Assert\GreaterThan('now')]
-    #[Assert\LessThan(propertyPath: 'endDate')]
+    #[Assert\NotBlank(message: 'Fill in the start date')]
+    #[Assert\GreaterThan('now', message: 'Start date must be in the future')]
 
     #[Groups(['booking:read', 'booking:write'])]
     #[ApiFilter(DateFilter::class, properties: ['startDate'])]
@@ -51,8 +51,8 @@ class Booking
 
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\GreaterThan(propertyPath: 'startDate')]
-    #[Assert\NotBlank]
+    #[Assert\GreaterThan(propertyPath: 'startDate', message: 'End date must be after start date')]
+    #[Assert\NotBlank(message: 'Fill in the end date')]
     #[Groups(['booking:read', 'booking:write'])]
     #[ApiFilter(DateFilter::class, properties: ['endDate'])]
     private ?DateTimeInterface $endDate = null;
@@ -62,7 +62,7 @@ class Booking
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Fill in the room')]
     #[Groups(['booking:read', 'booking:write'])]
 
     private ?Room $room = null;
