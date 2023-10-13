@@ -5,9 +5,8 @@ namespace App\Validation\Constraints;
 use App\Repository\BookingRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class RoomValidator extends ConstraintValidator
+class RoomAvailabilityConstraintValidator extends ConstraintValidator
 {
     private $bookingRepository;
 
@@ -18,8 +17,6 @@ class RoomValidator extends ConstraintValidator
 
     public function validate($protocol, Constraint $constraint)
     {
-
-
         $startDate = $protocol->getStartDate();
         $endDate = $protocol->getEndDate();
         $room = $protocol->getRoom();
