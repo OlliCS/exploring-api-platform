@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use DateTime;
 use Exception;
+use DateTimeZone;
 use App\Entity\Booking;
 use App\Service\BookingService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,7 +32,8 @@ class BookingCrudController extends AbstractCrudController
     }
     public function createEntity(string $entityFqcn)
     {
-        $booking = new Booking(new DateTime(),new DateTime(),null);
+        $timezone = new DateTimeZone('Europe/Amsterdam');
+        $booking = new Booking(new DateTime(null, $timezone),new DateTime(null, $timezone),null);
         return $booking;
 
     }
@@ -53,8 +55,11 @@ class BookingCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->hideOnForm();
-        yield DateTimeField::new('startDate')->setColumns(8);
-        yield DateTimeField::new('endDate')->setColumns(8);
+        yield DateTimeField::new('startDate')->setColumns(8)
+        ->setFormat('dd/MM/yyy HH:mm ');
+        yield DateTimeField::new('endDate')->setColumns(8)
+        ->setFormat('HH:mm ');
+
         yield AssociationField::new('room')->setColumns(8);
         yield TextField::new('duration')->setColumns(8)->hideOnForm();
     }
