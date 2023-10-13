@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 
 use App\Repository\RoomSearcherRepository;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -26,6 +27,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(NumericFilter::class, properties: ['people'])]
 #[ApiFilter(DateFilter::class, properties: ['date'])]
+#[ApiFilter(RangeFilter::class, properties: ['date', 'people'])]
+
 
 
 class RoomSearcher
