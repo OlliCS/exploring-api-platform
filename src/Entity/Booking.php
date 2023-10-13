@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => ['booking:write']],
 )]
 
-#[BookingAssert\RoomAvailabilityConstraint]
+#[BookingAssert\ValidBookingConstraint]
 #[ApiFilter(TermFilter::class, properties: ['room'])]
 class Booking
 {

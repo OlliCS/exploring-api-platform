@@ -6,7 +6,7 @@ use App\Service\BookingService;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class RoomAvailabilityConstraintValidator extends ConstraintValidator
+class ValidBookingConstraintValidator extends ConstraintValidator
 {
     private $bookingService;
 

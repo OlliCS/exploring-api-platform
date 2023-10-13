@@ -6,7 +6,7 @@ use Attribute;
 use Symfony\Component\Validator\Constraint;
 
 #[Attribute]
-class RoomAvailabilityConstraint extends Constraint
+class ValidBookingConstraint extends Constraint
 {
     public $responseMessage = '{{ responseMessage }}';
 
