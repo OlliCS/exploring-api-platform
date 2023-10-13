@@ -18,9 +18,7 @@ class RoomValidator extends ConstraintValidator
 
     public function validate($protocol, Constraint $constraint)
     {
-        if (!$constraint instanceof RoomAvailability) {
-            throw new UnexpectedTypeException($constraint, RoomAvailability::class);
-        }
+
 
         $startDate = $protocol->getStartDate();
         $endDate = $protocol->getEndDate();

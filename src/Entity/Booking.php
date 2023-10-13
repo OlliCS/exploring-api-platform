@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Validation\Constraints\RoomValidator;
 use DateTimeInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
@@ -17,8 +18,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: BookingRepository::class)]
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: BookingRepository::class)]
 #[ApiResource(description:'A booking for a room.' ,
    operations: [
     new Get(),
@@ -43,11 +45,21 @@ class Booking
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[ApiFilter(DateFilter::class, properties: ['endDate'])]
 
-     
+    /**
+     * @Assert\NotBlank
+     * @Assert\DateTime
+     * @Assert\Expression(
+     *     "this.getStartDate() < this.getEndDate()",
+     *     message="The end date must be after the start date"
+     * )
+     */ 
     private ?DateTimeInterface $endDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
+    /**
+     * @Assert\NotBlank(message="Please select a room")
+     */ 
     private ?Room $room = null;
 
     private ?string $duration = null;
