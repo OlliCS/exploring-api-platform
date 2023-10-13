@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Validation\Constraints;
+namespace App\Validator\Constraints;
 
 use App\Service\BookingService;
 use Symfony\Component\Validator\Constraint;
@@ -20,7 +20,7 @@ class RoomAvailabilityConstraintValidator extends ConstraintValidator
         $startDate = $protocol->getStartDate();
         $endDate = $protocol->getEndDate();
         $room = $protocol->getRoom();
-        
+
         $roomAvailabiltity = $this->bookingService->checkRoomAvailability($room, $startDate, $endDate);
 
         if (!$roomAvailabiltity->isSuccess()) {
