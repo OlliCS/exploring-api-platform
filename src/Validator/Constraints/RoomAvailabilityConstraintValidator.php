@@ -2,17 +2,17 @@
 
 namespace App\Validation\Constraints;
 
-use App\Repository\BookingRepository;
+use App\Service\BookingService;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class RoomAvailabilityConstraintValidator extends ConstraintValidator
 {
-    private $bookingRepository;
+    private $bookingService;
 
-    public function __construct(BookingRepository $bookingRepository)
+    public function __construct(BookingService $bookingService)
     {
-        $this->bookingRepository = $bookingRepository;
+        $this->bookingService = $bookingService;
     }
 
     public function validate($protocol, Constraint $constraint)
@@ -20,12 +20,12 @@ class RoomAvailabilityConstraintValidator extends ConstraintValidator
         $startDate = $protocol->getStartDate();
         $endDate = $protocol->getEndDate();
         $room = $protocol->getRoom();
+        
+        $roomAvailabiltity = $this->bookingService->checkRoomAvailability($room, $startDate, $endDate);
 
-        // Check room availability logic
-        if (!$this->bookingRepository->isRoomAvailable($room, $startDate, $endDate)) {
+        if (!$roomAvailabiltity->isSuccess()) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ startDate }}', $startDate->format('Y-m-d'))
-                ->setParameter('{{ endDate }}', $endDate->format('Y-m-d'))
+                ->setParameter('{{ responseMessage }}', $roomAvailabiltity->getMessage())
                 ->addViolation();
         }
     }
