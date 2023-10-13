@@ -9,5 +9,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class RoomAvailabilityConstraint extends Constraint
 {
-    public $message = 'The room is not available from {{ startDate }} to {{ endDate }}.';
+    public $responseMessage = '{{ responseMessage }}';
 }
