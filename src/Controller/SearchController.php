@@ -16,14 +16,16 @@ class SearchController extends AbstractController
         $this->searchService = $searchService;
     }
 
-    #[Route('/api/searches', name: 'app_search')]
+    #[Route('/api/searches', name: 'room_searcher')]
     public function search(Request $request): Response
     {
-        // $date = $request->get('date');
-        $people = $request->get('people');
+        $requestData = json_decode($request->getContent(), true);
+        $date = $requestData['date'];
+        $people = $requestData['people'];
 
         return $this->json([
             'people' => $people,
+            'date' => $date,
         ]);
 
 

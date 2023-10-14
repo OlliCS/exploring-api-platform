@@ -22,7 +22,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName:'search',
     description: 'Search for a room on a specific date and for a specific number of people.',
     operations: [
-    new Post(),
+    new Post(
+        name:'search',
+        routeName:'room_searcher',
+    ),
+
     ]
 
 )]
