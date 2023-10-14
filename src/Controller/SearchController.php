@@ -23,9 +23,12 @@ class SearchController extends AbstractController
         $date = $requestData['date'];
         $people = $requestData['people'];
 
+        $bookings = $this->searchService->searchBookingOfSpecificDay($date, $people);
+
         return $this->json([
             'people' => $people,
             'date' => $date,
+            'bookings' => $bookings,
         ]);
 
 
