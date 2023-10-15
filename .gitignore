@@ -9,3 +9,4 @@
 /vendor/
 .env
 node_modules
+public/build

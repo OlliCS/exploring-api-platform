@@ -180,7 +180,7 @@ export default {
   mounted() {
 
     this.fetchTimeSlots();
-    this.loadTimeSlots();
+
   }}
 }
 </script>
