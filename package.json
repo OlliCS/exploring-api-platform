@@ -23,6 +23,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "@daypilot/daypilot-lite-vue": "^3.18.0"
+        "@daypilot/daypilot-lite-vue": "^3.18.0",
+        "vue-number-input-spinner": "^2.2.0"
     }
 }
