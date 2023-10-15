@@ -30,8 +30,11 @@ class SearchController extends AbstractController
             'date' => $date,
             'bookings' => $bookings,
         ]);
+    }
 
-
-
+    #[Route('/test', name: 'app_test')]
+    public function test(): Response
+    {
+        return $this->render('calender/index.html.twig');
     }
 }
