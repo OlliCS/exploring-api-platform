@@ -8,12 +8,12 @@ class TimeSlot
     private $endDate;
     private $room;
 
-    public function __construct($startDate, $endDate, $room)
+    public function __construct($startDate, $endDate)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
-        $this->room = $room;
     }
+
 
     public function getStartDate()
     {
@@ -24,8 +24,6 @@ class TimeSlot
     {
         return $this->endDate;
     }
-    public function getRoom()
-    {
-        return $this->room;
-    }
+
+
 }

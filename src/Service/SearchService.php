@@ -6,6 +6,7 @@ use DatePeriod;
 use DateInterval;
 use App\Entity\Room;
 use App\Entity\Booking;
+use App\Entity\TimeSlot;
 use Doctrine\ORM\EntityManagerInterface;
 
 class SearchService{
@@ -20,9 +21,10 @@ class SearchService{
         $rooms = $this->getRoomsWithEnoughCapacity($people);
         $bookings = $this->getExistingBookings($date, $rooms);
         
-        // $timeslots = $this->calculateAvailableTimeSlots($rooms,$bookings,$date);
+        $timeslots = $this->calculateAvailableTimeSlots($rooms,$bookings,$date);
+        return $timeslots;
 
-        return $bookings;
+       
     }
 
     private function getRoomsWithEnoughCapacity($people)
@@ -58,12 +60,17 @@ class SearchService{
 
     private function calculateAvailableTimeSlots($rooms,$bookings,$date) : array
     {
+        $roomsWithFreeTimeSlots = [];
         $freeTimeSlots = [];
         foreach($rooms as $room){
-            $freeTimeSlots[$room->getName()] = $this->searchFreeTimeSlotsOfRoom($room, $bookings, $date);
+            $freeTimeSlots['room'] = $room;
+            $freeTimeSlots['slots'] = $this->searchFreeTimeSlotsOfRoom($room, $bookings, $date);
+
+            $roomsWithFreeTimeSlots[] = $freeTimeSlots;
+
         }
 
-        return $freeTimeSlots;
+        return $roomsWithFreeTimeSlots;
     }
 
 
@@ -82,7 +89,8 @@ class SearchService{
                 }
             }
             if($isFree){
-                array_push($freeTimeSlots, $date->format('H:i'));
+                $timeslot = new TimeSlot($date, (clone $date)->add(new DateInterval('PT30M')));
+                array_push($freeTimeSlots, $timeslot);
             }
         }
         return $freeTimeSlots;

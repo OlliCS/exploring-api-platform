@@ -21,7 +21,7 @@ export default {
   name: 'Calendar',
   data: function() {
     return {
-      events: [],
+      freeTimeSlots: [],
       people: 2,
       navigatorConfig: {
         showMonths: 1,
@@ -98,8 +98,7 @@ export default {
           })
         });
         const data = await response.json();
-        this.convertBookingJsonToEvents(data);
-
+        this.convertJsonInTimeSlots(data);
         return data;
       }catch(err){
         console.log(err);
@@ -107,36 +106,73 @@ export default {
 
       }
     },
-    loadEvents() {
-      const events = this.events;
-      this.calendar.update({events});
+    loadTimeSlots() {
+      const freeTimeSlots = this.freeTimeSlots;
+      try{
+        this.calendar.events.list = freeTimeSlots;
+      }
+      catch(err){
+        console.log(err);
+      }
+      this.calendar.update({freeTimeSlots});
     },
-    convertBookingJsonToEvents(data){
-      this.events = [];
-      console.log(data);
-      for(let booking of data){
-        let e = {
-          id: booking.id,
-          start: moment(booking.start).format('YYYY-MM-DDTHH:mm:ss'),
-          end: moment(booking.end).format('YYYY-MM-DDTHH:mm:ss'),
-          text: booking.room,
-          barColor: "#38761d",
-          barBackColor: "#93c47d",
+
+    convertJsonInTimeSlots(data){
+      const colors = [
+        // Greens
+        "#CCFFCC", // Very light green
+        "#99FF99", // Light green
+        "#66FF66", // Slightly dark light green
+        
+        // Blues
+        "#CCFFFF", // Very light blue
+        "#99FFFF", // Light blue
+        "#66FFFF", // Slightly dark light blue
+        ];
+    this.freeTimeSlots = [];
+    // Iterate over each room and its index
+    data.forEach((roomData, roomIndex) => {
+        // Safe-checks for data structure
+        if(!roomData.room || !roomData.slots) {
+            console.error("Invalid data structure:", roomData);
+            return;  // Skip this iteration if the data structure is not as expected
         }
 
-        console.log(e);
-        this.events.push(e);
+        const room = roomData.room;
+        const slots = roomData.slots;
 
-      }
+        const color = colors[roomIndex % colors.length];
+
+        // Iterating through each time slot
+        for(let timeSlot of slots){
+            // Ensure date parsing
+            let startHour = moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('HH:mm');
+            let endHour = moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('HH:mm');
+            
+            // Constructing the event object
+            let e = {
+                id: startHour + "-" + endHour + "-" + room.id,
+                start: moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
+                end: moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
+                text: room.name + " ("+ room.capacity + ")\t " + startHour + " -  " + endHour,
+                backColor: color,
+            }
+            this.freeTimeSlots.push(e);
+        }
+    });
+
+    this.loadTimeSlots();
+
+},
 
 
-    }
-  },
+
+
   mounted() {
 
-    this.fetchEvents();
-    this.loadEvents();
-  }
+    this.fetchTimeSlots();
+    this.loadTimeSlots();
+  }}
 }
 </script>
 <style>
