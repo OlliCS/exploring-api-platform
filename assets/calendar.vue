@@ -22,6 +22,7 @@ export default {
       navigatorConfig: {
         showMonths: 1,
         skipMonths: 1,
+        weekStarts: 1,
         selectMode: "Day",
         startDate: new Date().toISOString().split("T")[0],
         selectionDay: "2022-02-28",
@@ -31,9 +32,13 @@ export default {
       },
       config: {
         viewType: "Day",
+        businessBeginsHour: 8,
+        businessEndsHour: 20,
+        timeFormat: "Clock24Hours",
         startDate: new Date().toISOString().split("T")[0],
         durationBarVisible: false,
         timeRangeSelectedHandling: "Disabled",
+        weekStarts: 1,
         onTimeRangeSelected: async (args) => {
           const modal = await DayPilot.Modal.prompt("Create a new event:", "Event 1");
           const dp = args.control;
@@ -47,6 +52,7 @@ export default {
             id: DayPilot.guid(),
             text: modal.result
           });
+
         },
         eventMoveHandling: "Disabled",
         eventDeleteHandling: "Disabled",
@@ -145,7 +151,7 @@ export default {
 
 
 .background {
-  background: #721414;
+  background: black;
   padding: 10px;
 }
 
