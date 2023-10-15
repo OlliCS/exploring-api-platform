@@ -20,7 +20,9 @@ class SearchService{
         $rooms = $this->getRoomsWithEnoughCapacity($people);
         $bookings = $this->getExistingBookings($date, $rooms);
         
-        return $this->calculateAvailableTimeSlots($rooms,$bookings,$date);
+        // $timeslots = $this->calculateAvailableTimeSlots($rooms,$bookings,$date);
+
+        return $bookings;
     }
 
     private function getRoomsWithEnoughCapacity($people)

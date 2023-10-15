@@ -25,11 +25,7 @@ class SearchController extends AbstractController
 
         $bookings = $this->searchService->findAvailableTimeSlotsForDateAndCapacity($date, $people);
 
-        return $this->json([
-            'people' => $people,
-            'date' => $date,
-            'bookings' => $bookings,
-        ]);
+        return $this->json($bookings);
     }
 
     #[Route('/test', name: 'app_test')]
