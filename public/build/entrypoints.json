@@ -1,0 +1,14 @@
+{
+  "entrypoints": {
+    "app": {
+      "js": [
+        "/build/runtime.js"
+      ]
+    },
+    "calender": {
+      "js": [
+        "/build/runtime.js"
+      ]
+    }
+  }
+}
