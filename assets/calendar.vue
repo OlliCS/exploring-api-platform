@@ -95,6 +95,9 @@ export default {
   methods: {
     async fetchTimeSlots(){
       try{
+        if(this.config.startDate == null){
+          this.config.startDate = new Date().toISOString().split("T")[0];
+        }
         const response = await fetch('https://127.0.0.1:8000/api/searches',{
           method: 'POST',
           headers: {
@@ -108,6 +111,7 @@ export default {
         });
         const data = await response.json();
         this.convertJsonInTimeSlots(data);
+        this.loadTimeSlots();
         return data;
       }catch(err){
         console.log(err);
