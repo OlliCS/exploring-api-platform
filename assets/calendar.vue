@@ -25,9 +25,9 @@ export default {
         weekStarts: 1,
         selectMode: "Day",
         startDate: new Date().toISOString().split("T")[0],
-        selectionDay: "2022-02-28",
         onTimeRangeSelected: args => {
           this.config.startDate = args.day;
+          this.fetchEvents();
         }
       },
       config: {
@@ -90,10 +90,11 @@ export default {
           },
           body: JSON.stringify({
             "people": 5,
-            "date": "2022-02-28",
+            "date": this.config.startDate,
           })
         });
         const data = await response.json();
+        console.log(this.config.startDate);
         console.log(data);
         return data;
       }catch(err){
