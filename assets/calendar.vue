@@ -41,7 +41,8 @@ export default {
         timeFormat: "Clock24Hours",
         startDate: new Date().toISOString().split("T")[0],
         durationBarVisible: false,
-        timeRangeSelectedHandling: "Enabled",
+        eventClickHandling: "JavaScript",
+        timeRangeSelectedHandling: "Disabled",
         eventsLoadMethod:"POST",
         weekStarts: 1,
         onTimeRangeSelected: async (args) => {
@@ -67,6 +68,15 @@ export default {
         },
         onEventResized: () => {
           console.log("Event resized");
+        },
+        eventBooking(event) {
+  const confirmBooking = confirm(`Do you want to book ${event.text}?`);
+  if (confirmBooking) {
+    this.saveBooking(event);
+  }
+},
+        onEventClicked: (args) => {
+        this.eventBooking(args.e);
         },
       },
     }
@@ -130,6 +140,38 @@ export default {
       this.calendar.update({freeTimeSlots});
     },
 
+
+    async eventBooking(event)  {
+      console.log(event.data.id);
+
+          const modal = await DayPilot.Modal.prompt(`Do you want to save this timeslot for a meeting: ${event.data.text}`);
+
+          if (modal.canceled) {
+            return;
+          }
+          //call api to save event
+          const response = await fetch('https://127.0.0.1:8000/api/bookings',{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            "startDate": event.data.start,
+            "endDate": event.data.end,
+            "room": "/api/rooms/" + event.data.id,
+          })
+        });
+
+        const data = await response.json();
+        
+        fetchTimeSlots();
+        console.log(data);
+
+
+
+        },
+
     convertJsonInTimeSlots(data){
       const colors = [
         // Greens
@@ -164,7 +206,7 @@ export default {
             
             // Constructing the event object
             let e = {
-                id: startHour + "-" + endHour + "-" + room.id,
+                id: room.id,
                 start: moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
                 end: moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
                 text: room.name + " ("+ room.capacity + ")\t " + startHour + " -  " + endHour,
@@ -177,6 +219,8 @@ export default {
     this.loadTimeSlots();
 
 },
+
+
 
 
 
