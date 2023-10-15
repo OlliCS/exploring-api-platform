@@ -15,6 +15,7 @@
 
 <script>
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from '@daypilot/daypilot-lite-vue'
+import moment from 'moment'
 
 export default {
   name: 'Calendar',
@@ -92,13 +93,13 @@ export default {
             'Accept': 'application/json'
           },
           body: JSON.stringify({
-            "people": people,
+            "people": this.people,
             "date": this.config.startDate,
           })
         });
         const data = await response.json();
-        console.log(this.config.startDate);
-        console.log(data);
+        this.convertBookingJsonToEvents(data);
+
         return data;
       }catch(err){
         console.log(err);
@@ -107,48 +108,34 @@ export default {
       }
     },
     loadEvents() {
-      
-
-      // placeholder for an HTTP call
-      const events = [
-        {
-          id: 1,
-          start: "2023-10-15T10:00:00",
-          end: "2023-10-15T11:00:00",
-          text: "Event 1",
-          backColor: "#6aa84f",
-          borderColor: "#38761d",
-        },
-        {
-          id: 2,
-          start: "2022-02-28T13:00:00",
-          end: "2022-02-28T16:00:00",
-          text: "Event 2",
-          backColor: "#f1c232",
-          borderColor: "#bf9000",
-        },
-        {
-          id: 3,
-          start: "2022-03-01T13:30:00",
-          end: "2022-03-01T16:30:00",
-          text: "Event 3",
-          backColor: "#cc4125",
-          borderColor: "#990000",
-        },
-        {
-          id: 4,
-          start: "2022-03-01T10:30:00",
-          end: "2022-03-01T12:30:00",
-          text: "Event 4"
-        },
-      ];
+      const events = this.events;
       this.calendar.update({events});
     },
+    convertBookingJsonToEvents(data){
+      this.events = [];
+      console.log(data);
+      for(let booking of data){
+        let e = {
+          id: booking.id,
+          start: moment(booking.start).format('YYYY-MM-DDTHH:mm:ss'),
+          end: moment(booking.end).format('YYYY-MM-DDTHH:mm:ss'),
+          text: booking.room,
+          barColor: "#38761d",
+          barBackColor: "#93c47d",
+        }
+
+        console.log(e);
+        this.events.push(e);
+
+      }
+
+
+    }
   },
   mounted() {
-    this.loadEvents();
-    this.fetchEvents();
 
+    this.fetchEvents();
+    this.loadEvents();
   }
 }
 </script>
