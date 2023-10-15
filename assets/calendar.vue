@@ -38,6 +38,7 @@ export default {
         startDate: new Date().toISOString().split("T")[0],
         durationBarVisible: false,
         timeRangeSelectedHandling: "Disabled",
+        eventsLoadMethod:"POST",
         weekStarts: 1,
         onTimeRangeSelected: async (args) => {
           const modal = await DayPilot.Modal.prompt("Create a new event:", "Event 1");
@@ -52,6 +53,7 @@ export default {
             id: DayPilot.guid(),
             text: modal.result
           });
+
 
         },
         eventMoveHandling: "Disabled",
@@ -78,7 +80,31 @@ export default {
     }
   },
   methods: {
+    async fetchEvents(){
+      try{
+        const response = await fetch('https://127.0.0.1:8000/api/searches',{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            "people": 5,
+            "date": "2022-02-28",
+          })
+        });
+        const data = await response.json();
+        console.log(data);
+        return data;
+      }catch(err){
+        console.log(err);
+
+
+      }
+    },
     loadEvents() {
+      
+
       // placeholder for an HTTP call
       const events = [
         {
@@ -117,6 +143,8 @@ export default {
   },
   mounted() {
     this.loadEvents();
+    this.fetchEvents();
+
   }
 }
 </script>
