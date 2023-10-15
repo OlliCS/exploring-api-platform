@@ -1,13 +1,15 @@
 <template>
-  <div class="background">
   <div class="wrap">
     <div class="left">
+      <h2>How many people ?</h2>
+      <input class="input" type="number" v-model="people" min="2" max="100"/>
+      <h2>Select a date:</h2>
       <DayPilotNavigator id="nav" :config="navigatorConfig" />
+
     </div>
-    <div class="content" >
-      <DayPilotCalendar id="dp"   :config="config" ref="calendar" />
+    <div class="content">
+      <DayPilotCalendar id="dp" :config="config" ref="calendar" />
     </div>
-  </div>
   </div>
 </template>
 
@@ -19,6 +21,7 @@ export default {
   data: function() {
     return {
       events: [],
+      people: 2,
       navigatorConfig: {
         showMonths: 1,
         skipMonths: 1,
@@ -89,7 +92,7 @@ export default {
             'Accept': 'application/json'
           },
           body: JSON.stringify({
-            "people": 5,
+            "people": people,
             "date": this.config.startDate,
           })
         });
@@ -149,42 +152,32 @@ export default {
   }
 }
 </script>
-
 <style>
 .wrap {
   display: flex;
-  flex-direction: row;
 }
 
 .left {
   margin-right: 10px;
-  width: 200px;
 }
 
 .content {
   flex-grow: 1;
-  max-width: 500px;
+}
+
+.input {
+  margin-top: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+  font-size: 16px;
 }
 
 
 .calendar_default_event_inner {
   background: #2e78d6;
-  color: black;
+  color: white;
   border-radius: 5px;
   opacity: 0.9;
-}
-
-.calendar{
-  width:100px;
-}
-
-
-.background {
-  background: black;
-  padding: 10px;
-}
-
-*{
-  margin:0;
 }
 </style>
