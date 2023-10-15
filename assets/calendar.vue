@@ -31,7 +31,7 @@ export default {
         startDate: new Date().toISOString().split("T")[0],
         onTimeRangeSelected: args => {
           this.config.startDate = args.day;
-          this.fetchEvents();
+          this.fetchTimeSlots();
         }
       },
       config: {
@@ -41,11 +41,11 @@ export default {
         timeFormat: "Clock24Hours",
         startDate: new Date().toISOString().split("T")[0],
         durationBarVisible: false,
-        timeRangeSelectedHandling: "Disabled",
+        timeRangeSelectedHandling: "Enabled",
         eventsLoadMethod:"POST",
         weekStarts: 1,
         onTimeRangeSelected: async (args) => {
-          const modal = await DayPilot.Modal.prompt("Create a new event:", "Event 1");
+          const modal = await DayPilot.Modal.prompt("Do you want to save this timeslot for a meeting:", "Event 1");
           const dp = args.control;
           dp.clearSelection();
           if (modal.canceled) {
@@ -71,6 +71,15 @@ export default {
       },
     }
   },
+  watch: {
+    people(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        console.log("Number input changed to:", newVal);
+        this.fetchTimeSlots();
+
+      }
+    }
+  },
   props: {
   },
   components: {
@@ -84,7 +93,7 @@ export default {
     }
   },
   methods: {
-    async fetchEvents(){
+    async fetchTimeSlots(){
       try{
         const response = await fetch('https://127.0.0.1:8000/api/searches',{
           method: 'POST',
