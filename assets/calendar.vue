@@ -178,8 +178,6 @@ export default {
 
 },
 
- 
-
 
 
   mounted() {
