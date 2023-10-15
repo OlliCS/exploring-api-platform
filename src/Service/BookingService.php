@@ -6,8 +6,10 @@ use DateTime;
 use Exception;
 use App\Entity\Room;
 use App\Entity\Booking;
+use App\Validator\TimeValidator;
 use App\Response\BookingResponse;
 use App\Validator\TimeSlotValidator;
+use App\Response\TimeValidatorResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Response\RoomAvailabilityResponse;
 use App\Response\TimeSlotValidatorResponse;
@@ -73,14 +75,14 @@ class BookingService
         }
     }
 
-    private function validateTimeSlot($startDate, $endDate): TimeSlotValidatorResponse
+    private function validateTimeSlot($startDate, $endDate): TimeValidatorResponse
     {
         try{
-            $timeSlotValidator = new TimeSlotValidator($startDate, $endDate);
+            $timeSlotValidator = new TimeValidator($startDate, $endDate);
             return $timeSlotValidator->validate();
         }
         catch(Exception $e){
-            return new TimeSlotValidatorResponse(false, $e->getMessage());
+            return new TimeValidatorResponse(false, $e->getMessage());
         }
     }
 }
