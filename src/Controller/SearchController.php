@@ -28,9 +28,9 @@ class SearchController extends AbstractController
         return $this->json($bookings);
     }
 
-    #[Route('/test', name: 'app_test')]
+    #[Route('/calendar', name: 'app_calendar')]
     public function test(): Response
     {
-        return $this->render('calender/index.html.twig');
+        return $this->render('calendar/index.html.twig');
     }
 }
