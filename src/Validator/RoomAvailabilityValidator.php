@@ -9,14 +9,14 @@ use App\Response\RoomAvailabilityResponse;
 class RoomAvailabilityValidator {
     private DateTime $startDate;
     private DateTime $endDate;
-    private $bookings;
+    private $existingBookings;
     private const  DATEFORMAT = 'Y-m-d H:i';
 
-    public function __construct(DateTime $startDate, DateTime $endDate, $bookings)
+    public function __construct(DateTime $startDate, DateTime $endDate, $existingBookings)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
-        $this->bookings = $bookings;
+        $this->bookings = $existingBookings;
     }
 
     public function validate() : RoomAvailabilityResponse
@@ -36,7 +36,7 @@ class RoomAvailabilityValidator {
 
     private function validateHourConflictsWithExistingBookings() : RoomAvailabilityResponse
     {
-        foreach($this->bookings as $booking) {
+        foreach($this->existingBookings as $booking) {
             if($this->startDate >= $booking->getStartDate() && $this->startDate < $booking->getEndDate()) {
                 return new RoomAvailabilityResponse(
                     false,
@@ -53,7 +53,7 @@ class RoomAvailabilityValidator {
 
     private function validateBookingIsNotOverlapping() : RoomAvailabilityResponse
     {
-        foreach($this->bookings as $booking) {
+        foreach($this->existingBookings as $booking) {
             if($this->startDate <= $booking->getStartDate() && $this->endDate >= $booking->getEndDate()) {
                 return new RoomAvailabilityResponse(false, "The booking is overlapping with an existing booking, {$this->createMessageOfConflictingBooking($booking)}");
             }
