@@ -81,12 +81,15 @@ class SearchService{
         $freeTimeSlots = [];
         foreach($period as $date){
             $isFree = true;
+            $endDate = (clone $date)->add(new DateInterval('PT30M'));
             foreach($bookings as $booking){
                 if($booking->getRoom() == $room){
-                    if($date >= $booking->getStartDate() && $date <= $booking->getEndDate()){
+                    if($date >= $booking->getStartDate() && $date < $booking->getEndDate() || ($endDate > $booking->getStartDate() && $endDate <= $booking->getEndDate())){
                         $isFree = false;
+                        break;
                     }
                 }
+
             }
             if($isFree){
                 $timeslot = new TimeSlot($date, (clone $date)->add(new DateInterval('PT30M')));
