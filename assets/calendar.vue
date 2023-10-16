@@ -5,16 +5,9 @@
       <h2>Meeting organiser</h2>
       <input class="input" type="number" v-model="people" min="2" max="100" />
         <DayPilotNavigator id="nav" :config="navigatorConfig" />
-
-        <p class="message">{{message}}</p>
-        <p class="errorMessage">{{errorMessage}}</p>
-        <p class="message">{{detailMessage}}</p>
-
     </div>
     <div class="content">
-
         <DayPilotCalendar id="dp" :config="config" ref="calendar" />
-
     </div>
   </div>
 </div>
@@ -26,6 +19,7 @@
 
 <script>
 import { DayPilot, DayPilotCalendar, DayPilotNavigator } from '@daypilot/daypilot-lite-vue'
+import {Modal} from "@daypilot/modal";
 import moment from 'moment'
 
 export default {
@@ -71,19 +65,13 @@ export default {
         eventsLoadMethod: "POST",
 
         onTimeRangeSelected: async (args) => {
-          //const modal = await DayPilot.Modal.prompt("Do you want to save this timeslot for a meeting:");
-          this.message = "Do you want to save this timeslot for a meeting?"
+          const modal = await DayPilot.Modal.alert("Please select a timeslot");
           const dp = args.control;
           dp.clearSelection();
           if (modal.canceled) {
             return;
           }
-          dp.events.add({
-            start: args.start,
-            end: args.end,
-            id: DayPilot.guid(),
-            text: modal.result
-          });
+
         },
 
         eventBooking(event) {
@@ -111,7 +99,8 @@ export default {
   },
   components: {
     DayPilotCalendar,
-    DayPilotNavigator
+    DayPilotNavigator,
+    Modal
   },
   computed: {
     calendar() {
@@ -170,11 +159,39 @@ export default {
       }
       this.calendar.update({ freeTimeSlots });
     },
-    async eventBooking(event) {
-      const modal = await DayPilot.Modal.prompt(`Do you want to save this timeslot for a meeting: ${event.data.text}`);
-    
-      
+    async eventBooking(e) {
+      const form = [
+        { 
+          name: "Room", 
+          id: "text", 
+          type: "text",
+          disabled: true,
+        },
+        {
+          name:"Start time",
+          id: "start",
+          type:"datetime",
+          disabled: true,
+        },
+        {
+          name:"End time",
+          id: "end",
+          type:"datetime",
+          disabled: false,
+          focused: false,
 
+        },
+        {
+          name:"Email",
+          id: "email",
+          type:"text",
+          disabled: false,
+          focused: true
+        }
+      ];
+
+      const formData = e.data;
+      const modal = await DayPilot.Modal.form(form, formData,{focus:e.data.end});
       if (modal.canceled) {
         return;
       }
@@ -237,16 +254,12 @@ export default {
 
         // Iterating through each time slot
         for (let timeSlot of slots) {
-          // Ensure date parsing
-          let startHour = moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('HH:mm');
-          let endHour = moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('HH:mm');
-
           // Constructing the event object
           let e = {
             id: room.id,
             start: moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
             end: moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
-            text: room.name + " (" + room.capacity + ")\t " + startHour + " -  " + endHour,
+            text: room.name + " (" + room.capacity + ")",
             backColor: color,
           }
           this.freeTimeSlots.push(e);
