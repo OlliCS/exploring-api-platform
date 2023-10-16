@@ -34,18 +34,15 @@ export default {
         startDate: new Date().toISOString().split("T")[0],
         onTimeRangeSelected: args => {
           var today = new DayPilot.Date().getDatePart();
+          this.config.startDate = args.day;
           if (args.start < today) {
             args.preventDefault();
             alert("Please choose a future date")
-            this.config.startDate = today;
             return;
           }
           else{
-            this.config.startDate = args.day;
-          this.fetchTimeSlots();
+            this.fetchTimeSlots();
           }
-
-
         }
       },
       config: {
