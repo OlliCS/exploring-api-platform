@@ -36,6 +36,7 @@ export default {
         "#99FFFF", // Light blue
         "#66FFFF", // Slightly dark light blue
       ],
+      apiBaseUrl: "https://127.0.0.1:8000/api/",
       errorMessage: "",
       navigatorConfig: {
         showMonths: 1,
@@ -129,28 +130,39 @@ export default {
     },
     async fetchTimeSlots() {
       try {
-        if (this.config.startDate == null) {
-          this.config.startDate = new Date().toISOString().split("T")[0];
-        }
-        const response = await fetch('https://127.0.0.1:8000/api/searches', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
+        let result = await this.callApi('searches', 'POST', {
             "people": this.people,
             "date": this.config.startDate,
-          })
-        });
-        const data = await response.json();
-        this.convertJsonInTimeSlots(data);
+          });
+        this.convertJsonInTimeSlots(result);
         this.loadTimeSlots();
         return data;
       }catch (err) {
         console.log(err);
       }
     },
+
+    async callApi(endpoint, method, body) {
+      let apiUrl = this.apiBaseUrl + endpoint;
+      return fetch(apiUrl, {
+        method: method,
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .catch(error => console.log(error));
+    },
+
+
+
     loadTimeSlots() {
       const freeTimeSlots = this.freeTimeSlots;
       try {
@@ -256,9 +268,6 @@ export default {
           this.freeTimeSlots.push(e);
         }
       });
-
-      this.loadTimeSlots();
-
     },
 
     mounted() {
