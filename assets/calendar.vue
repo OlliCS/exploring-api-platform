@@ -23,7 +23,7 @@ export default {
   name: 'Calendar',
   data: function () {
     return {
-      freeTimeSlots: [],
+      timeSlots: [],
       people: 2,
       colors : [
         // Greens
@@ -114,7 +114,7 @@ export default {
             return;
           }
           this.errorMessage = "";
-          this.fetchTimeSlots();
+          this.loadTimeSlots();
     },
     checkIfSelectedDateInNavigatorIsValid(selectedDate){
       var today = new DayPilot.Date().getDatePart();
@@ -128,20 +128,22 @@ export default {
       }
       return true;
     },
+    async loadTimeSlots() {
+      this.timeSlots = [];
+      await this.fetchTimeSlots();
+      this.refreshCalendarWithTimeSlots();
+    },
     async fetchTimeSlots() {
       try {
         let result = await this.callApi('searches', 'POST', {
             "people": this.people,
             "date": this.config.startDate,
           });
-        this.convertJsonInTimeSlots(result);
-        this.loadTimeSlots();
-        return data;
+        this.convertApiResponseInTimeSlots(result);
       }catch (err) {
         console.log(err);
       }
     },
-
     async callApi(endpoint, method, body) {
       let apiUrl = this.apiBaseUrl + endpoint;
       return fetch(apiUrl, {
@@ -160,19 +162,12 @@ export default {
       })
       .catch(error => console.log(error));
     },
-
-
-
-    loadTimeSlots() {
-      const freeTimeSlots = this.freeTimeSlots;
-      try {
-        this.calendar.events.list = freeTimeSlots;
-      }
-      catch (err) {
-        console.log(err);
-      }
-      this.calendar.update({ freeTimeSlots });
+    refreshCalendarWithTimeSlots() {
+      const freeTimeSlots = this.timeSlots;
+      this.calendar.events.list = freeTimeSlots;
+      this.calendar.update();
     },
+    
     async eventBooking(e) {
       const form = [
         { 
@@ -226,7 +221,7 @@ export default {
 
       if (response.ok) {
         this.fetchTimeSlots();
-        this.loadTimeSlots();
+        this.refreshCalendarWithTimeSlots();
         this.errorMessage = "";
         this.message = "Booking saved";
         this.detailMessage = `${event.data.text}`
@@ -239,7 +234,7 @@ export default {
       console.log(data);
     },
 
-    convertJsonInTimeSlots(data) {
+    convertApiResponseInTimeSlots(data) {
 
       this.freeTimeSlots = [];
       // Iterate over each room and its index
@@ -265,13 +260,13 @@ export default {
             text: room.name + " (" + room.capacity + ")",
             backColor: color,
           }
-          this.freeTimeSlots.push(e);
+          this.timeSlots.push(e);
         }
       });
     },
 
     mounted() {
-      this.fetchTimeSlots();
+      this.loadTimeSlots();
     }
   }
 }
