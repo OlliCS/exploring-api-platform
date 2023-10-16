@@ -147,26 +147,22 @@ export default {
     },
     async callApi(endpoint, method, body) {
       let apiUrl = this.apiBaseUrl + endpoint;
-      return fetch(apiUrl, {
-        method: method,
-        body: JSON.stringify(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      })
-      .then(response => {
-        if (!response.ok) {
-          console.log(response.message);
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .catch(error => 
-      {
-        console.log(error);
-        throw error;
-      });
+      try{
+        let response = await axios({
+          method: method,
+          url: apiUrl,
+          data: body,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+        return response.data;
+        
+      }
+      catch (err) {
+        console.log(err);
+      }
     },
     refreshCalendarWithTimeSlots() {
       const freeTimeSlots = this.timeSlots;
@@ -212,13 +208,16 @@ export default {
         let response = await this.callApi('bookings', 'POST', {
           "startDate": modal.result.start,
           "endDate": modal.result.end,
-          "room": "/api/rooms/" + modal.result.id,
-        }); 
-        console.log("Booking successful");
-        this.createErrorModal("Booking successful",e);
-        this.loadTimeSlots(); 
+          "room":  modal.result.id,
+        });
+        if(response.success === true){
+          this.createErrorModal(`Booking successful`,e);
+          this.loadTimeSlots(); 
+        } 
+        else{
+          this.createErrorModal(`${response.message}`,e);
+        }
       }catch (err) {
-        
         this.createErrorModal(`Booking failed`,e);
         console.log(err);
       }
