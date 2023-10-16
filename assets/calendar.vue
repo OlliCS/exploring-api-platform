@@ -73,7 +73,7 @@ export default {
           this.createErrorModal("You can't move a timeslot",args);
         },
         onEventClicked: (args) => {
-          this.selectTimeSlot(args.e);
+          this.selectTimeSlotForBooking(args.e);
         },
       },
     }
@@ -160,7 +160,11 @@ export default {
         }
         return response.json();
       })
-      .catch(error => console.log(error));
+      .catch(error => 
+      {
+        console.log(error);
+        throw error;
+      });
     },
     refreshCalendarWithTimeSlots() {
       const freeTimeSlots = this.timeSlots;
@@ -169,7 +173,7 @@ export default {
       this.calendar.update({freeTimeSlots});
     },
     
-    async selectTimeSlot(e) {
+    async selectTimeSlotForBooking(e) {
       const bookingform = [
         { 
           name: "Room", 
@@ -198,38 +202,24 @@ export default {
       ];
       const bookingFormData = e.data;
       const modal = await DayPilot.Modal.form(bookingform, bookingFormData,{focus: "email"});
-      if (modal.canceled) {
+      if (modal.canceled || !modal.result) {
         return;
       }
-      //call api to save event
-      const response = await fetch('https://127.0.0.1:8000/api/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          "startDate": event.data.start,
-          "endDate": event.data.end,
-          "room": "/api/rooms/" + event.data.id,
-        })
-      });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        this.fetchTimeSlots();
-        this.refreshCalendarWithTimeSlots();
-        this.errorMessage = "";
-        this.message = "Booking saved";
-        this.detailMessage = `${event.data.text}`
+      try{
+        let response = await this.callApi('bookings', 'POST', {
+          "startDate": modal.result.start,
+          "endDate": modal.result.end,
+          "room": "/api/rooms/" + modal.result.id,
+        }); 
+        console.log("Booking successful");
+        this.createErrorModal("Booking successful",e);
+        this.loadTimeSlots(); 
+      }catch (err) {
+        
+        this.createErrorModal(`Booking failed`,e);
+        console.log(err);
       }
-      else{
-        this.errorMessage = "Failed saving booking";
-        this.message = "";
-        this.detailMessage = `${response.status}`;
-      }
-      console.log(data);
     },
 
     convertApiResponseInTimeSlots(roomDataList) {
