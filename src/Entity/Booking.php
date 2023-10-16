@@ -27,7 +27,10 @@ use Symfony\Component\Validator\Constraints as Assert;
    operations: [
     new Get(),
     new GetCollection(),
-    new Post(),
+    new Post(
+        name:'create_booking',
+        routeName:'booking_create',
+    ),
     new Put(),
     new Delete()],
     normalizationContext: ['groups' => ['booking:read']],
