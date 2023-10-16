@@ -80,10 +80,10 @@ export default {
     }
   },
   watch: {
-    people(newVal, oldVal) {
+    async people(newVal, oldVal) {
       if (newVal !== oldVal) {
         console.log("Number input changed to:", newVal);
-        this.fetchTimeSlots();
+        await this.loadTimeSlots();
       }
     }
   },
