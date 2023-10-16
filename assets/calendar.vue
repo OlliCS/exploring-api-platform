@@ -164,8 +164,9 @@ export default {
     },
     refreshCalendarWithTimeSlots() {
       const freeTimeSlots = this.timeSlots;
+      this.timeSlots = [];
       this.calendar.events.list = freeTimeSlots;
-      this.calendar.update();
+      this.calendar.update({freeTimeSlots});
     },
     
     async selectTimeSlot(e) {
