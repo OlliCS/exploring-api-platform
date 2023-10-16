@@ -170,7 +170,7 @@ export default {
     },
     
     async selectTimeSlot(e) {
-      const form = [
+      const bookingform = [
         { 
           name: "Room", 
           id: "text", 
@@ -196,9 +196,8 @@ export default {
           required: false,
         }
       ];
-
-      const formData = e.data;
-      const modal = await DayPilot.Modal.form(form, formData,{focus: "email"});
+      const bookingFormData = e.data;
+      const modal = await DayPilot.Modal.form(bookingform, bookingFormData,{focus: "email"});
       if (modal.canceled) {
         return;
       }
