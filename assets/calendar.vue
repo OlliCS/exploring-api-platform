@@ -25,6 +25,17 @@ export default {
     return {
       freeTimeSlots: [],
       people: 2,
+      colors : [
+        // Greens
+        "#CCFFCC", // Very light green
+        "#99FF99", // Light green
+        "#66FF66", // Slightly dark light green
+
+        // Blues
+        "#CCFFFF", // Very light blue
+        "#99FFFF", // Light blue
+        "#66FFFF", // Slightly dark light blue
+      ],
       errorMessage: "",
       navigatorConfig: {
         showMonths: 1,
@@ -55,10 +66,10 @@ export default {
         eventClickHandling: "JavaScript",
         eventsLoadMethod: "POST",
         onTimeRangeSelected: async (args) => {
-          this.handleTimeSelectedNotTimeSlot(args);
+          this.createErrorModal("Please select a timeslot",args);
         },
         onEventMoved: async (args) => {
-          this.handleTimeSlotMoving(args);
+          this.createErrorModal("You can't move a timeslot",args);
         },
         onEventClicked: (args) => {
           this.eventBooking(args.e);
@@ -87,21 +98,13 @@ export default {
     }
   },
   methods: {
-   async handleTimeSelectedNotTimeSlot(args){
-      const modal = await DayPilot.Modal.alert("Please select a timeslot");
-          const dp = args.control;
-          dp.clearSelection();
-          if (modal.canceled) {
-            return;
-          }
-    },
-    async handleTimeSlotMoving(args){
-      const modal = await DayPilot.Modal.alert("You can't move a timeslot");
-          const dp = args.control;
-          dp.clearSelection();
-          if (modal.canceled) {
-            return;
-          }
+    async createErrorModal(message,args){
+      const modal = await DayPilot.Modal.alert(message);
+      const dp = args.control;
+      dp.clearSelection();
+      if (modal.canceled) {
+        return;
+      }
     },
     handleDateChangeInNavigator(args) {
     var today = new DayPilot.Date().getDatePart();
@@ -111,13 +114,11 @@ export default {
             this.errorMessage = "You can't select a day in the past";
             return;
           }
-
           if (args.day.dayOfWeek() === 6 || args.day.dayOfWeek() === 0) {
             args.preventDefault();
             this.errorMessage = "You can't select a weekend day";
             return;
           }
-
           this.errorMessage = "";
           this.fetchTimeSlots();
     },
@@ -141,7 +142,7 @@ export default {
         this.convertJsonInTimeSlots(data);
         this.loadTimeSlots();
         return data;
-      } catch (err) {
+      }catch (err) {
         console.log(err);
       }
     },
@@ -222,17 +223,7 @@ export default {
     },
 
     convertJsonInTimeSlots(data) {
-      const colors = [
-        // Greens
-        "#CCFFCC", // Very light green
-        "#99FF99", // Light green
-        "#66FF66", // Slightly dark light green
 
-        // Blues
-        "#CCFFFF", // Very light blue
-        "#99FFFF", // Light blue
-        "#66FFFF", // Slightly dark light blue
-      ];
       this.freeTimeSlots = [];
       // Iterate over each room and its index
       data.forEach((roomData, roomIndex) => {
@@ -245,7 +236,7 @@ export default {
         const room = roomData.room;
         const slots = roomData.slots;
 
-        const color = colors[roomIndex % colors.length];
+        const color = this.colors[roomIndex % this.colors.length];
 
         // Iterating through each time slot
         for (let timeSlot of slots) {
