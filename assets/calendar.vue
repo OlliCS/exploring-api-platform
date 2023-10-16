@@ -156,6 +156,7 @@ export default {
       })
       .then(response => {
         if (!response.ok) {
+          console.log(response.message);
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
