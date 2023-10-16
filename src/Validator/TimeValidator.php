@@ -8,12 +8,15 @@ use App\Response\TimeValidatorResponse;
 
 class TimeValidator 
 {
+    private const DATEFORMAT = 'Y-m-d H:i:s';
+    private const WORKING_HOURS_START = 8; //hours
+    private const WORKING_HOURS_END = 20; //hours
+    private const MAX_BOOKING_DURATION_HOURS = 12; //hours
+    private const MIN_BOOKING_DURATION_MINUTES = 15; //minutes
+
+
     private DateTime $startDate;
     private DateTime $endDate;
-    private const  DATEFORMAT = 'Y-m-d H:i:s';
-    private const MAX_BOOKING_DURATION = 12; //hours
-    private const MIN_BOOKING_DURATION = 15; //minutes
-    
 
     public function __construct(DateTime $startDate, DateTime $endDate)
     {
@@ -23,32 +26,24 @@ class TimeValidator
 
     public function validate() : TimeValidatorResponse
     {
-        $validation = $this->validateDatesAreInTheFuture();
-        if (!$validation->isSuccess()) {
-            return $validation;
+        $validations = [
+            'validateDatesAreInTheFuture',
+            'validateStartDateIsBeforeEndDate',
+            'validateDurationIsNotShort',
+            'validateDateIsNotInTheWeekend',
+            'validateTimeIsBetweenWorkingHours',
+            'validateDurationIsNotTooLong',
+            
+        ];
+
+        foreach ($validations as $validation) {
+            $validationResponse = $this->$validation();
+            if (!$validationResponse->isSuccess()) {
+                return $validationResponse;
+            }
         }
 
-        $validation = $this->validateStartDateIsBeforeEndDate();
-        if (!$validation->isSuccess()) {
-            return $validation;
-        }
-
-        $validation = $this->validateDurationIsNotShort();
-        if (!$validation->isSuccess()) {
-            return $validation;
-        }
-
-        $validation = $this->validateDateIsNotInTheWeekend();
-        if (!$validation->isSuccess()) {
-            return $validation;
-        }
-
-        $validation = $this->validateTimeIsBetweenWorkingHours();
-        if (!$validation->isSuccess()) {
-            return $validation;
-        }
-
-        return $this->validateDurationIsNotTooLong();
+        return new TimeValidatorResponse(true, "The time is valid");
     }
 
     private function validateDatesAreInTheFuture() : TimeValidatorResponse
@@ -80,26 +75,26 @@ class TimeValidator
 
     private function validateDurationIsNotTooLong() : TimeValidatorResponse
     {
-        $maxBookingDurationInSeconds = self::MAX_BOOKING_DURATION * 60 * 60; 
+        $maxBookingDurationInSeconds = self::MAX_BOOKING_DURATION_HOURS * 60 * 60; 
         $diffInSeconds = $this->endDate->getTimestamp() - $this->startDate->getTimestamp();
         
         if ($diffInSeconds > $maxBookingDurationInSeconds) {
-            return new TimeValidatorResponse(false, "The booking cannot be longer than 12 hours");
+            return new TimeValidatorResponse(false, "The booking cannot be longer than" . self::MAX_BOOKING_DURATION_HOURS . " hours");
         }
 
-        return new TimeValidatorResponse(true, "The time is valid");
+        return new TimeValidatorResponse(true, "The duration is not too long");
     }
 
     private function validateDurationIsNotShort() : TimeValidatorResponse
     {
-        $minBookingDurationInSeconds = 15 * 60; 
+        $minBookingDurationInSeconds = self::MIN_BOOKING_DURATION_MINUTES * 60; 
         $diffInSeconds = $this->endDate->getTimestamp() - $this->startDate->getTimestamp();
         
         if ($diffInSeconds < $minBookingDurationInSeconds) {
-            return new TimeValidatorResponse(false, "The booking cannot be shorter than 15 minutes");
+            return new TimeValidatorResponse(false, "The booking cannot be shorter than ". self::MIN_BOOKING_DURATION_MINUTES ." minutes");
         }
 
-        return new TimeValidatorResponse(true, "The time is valid");
+        return new TimeValidatorResponse(true, "The duration is not too short");
     }
 
     private function validateDateIsNotInTheWeekend() : TimeValidatorResponse
@@ -123,18 +118,19 @@ class TimeValidator
         $invalidDates = [];
         $startHour = $this->startDate->format('H');
         $endHour = $this->endDate->format('H');
+        $workingHoursMessage = " not between working hours (" . self::WORKING_HOURS_START . "-" . self::WORKING_HOURS_END . ") ";
 
-        if ($startHour < 8 || $startHour > 20) {
-            $invalidDates[] = "start date {$this->startDate->format(self::DATEFORMAT)} is not between working hours (8-20)";
+        if ($startHour < self::WORKING_HOURS_START || $startHour > self::WORKING_HOURS_END) {
+            $invalidDates[] = "start date {$this->startDate->format(self::DATEFORMAT)}";
         }
 
-        if ($endHour < 8 || $endHour > 20) {
-            $invalidDates[] = "end date {$this->endDate->format(self::DATEFORMAT)} is not between working hours (8-20)";
+        if ($endHour < self::WORKING_HOURS_START || $endHour > self::WORKING_HOURS_END) {
+            $invalidDates[] = "end date {$this->endDate->format(self::DATEFORMAT)}";
         }
 
         if(!empty($invalidDates)) {
-            return new TimeValidatorResponse(false, "Invalid dates: " . implode(', ', $invalidDates));
+            return new TimeValidatorResponse(false, "Invalid dates: " . $workingHoursMessage . "" . implode(', ', $invalidDates));
         }
-        return new TimeValidatorResponse(true, "Dates are between working hours (8-20)");
+        return new TimeValidatorResponse(true, "Dates are between working hours");
     }
 }
