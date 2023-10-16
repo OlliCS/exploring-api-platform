@@ -1,4 +1,5 @@
 <template>
+  <div class="container">
   <div class="wrap">
     <div class="left">
       <h2>How many people ?</h2>
@@ -16,6 +17,7 @@
       <DayPilotCalendar id="dp" :config="config" ref="calendar" />
     </div>
   </div>
+</div>
 </template>
 
 
@@ -52,7 +54,8 @@ export default {
         dayBeginsHour: 8,
         dayEndsHour: 20,
         durationBarVisible: false,
-
+        heightSpec: "BusinessHours",
+ 
         timeRangeSelectedHandling: "Disabled",
         eventMoveHandling: "Disabled",
         eventDeleteHandling: "Disabled",
@@ -293,4 +296,16 @@ export default {
   border-radius: 5px;
   opacity: 0.9;
 }
+
+.container{
+  height: 100vh;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+
+  
+}
+
+
+
 </style>
