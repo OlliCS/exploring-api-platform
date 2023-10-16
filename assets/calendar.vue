@@ -13,10 +13,6 @@
 </div>
 </template>
 
-
-
-
-
 <script>
 import { DayPilot, DayPilotCalendar, DayPilotNavigator } from '@daypilot/daypilot-lite-vue'
 import {Modal} from "@daypilot/modal";
@@ -26,9 +22,6 @@ export default {
   name: 'Calendar',
   data: function () {
     return {
-      message: "Select a day ",
-      detailMessage: "",
-      errorMessage: "",
       freeTimeSlots: [],
       people: 2,
       navigatorConfig: {
@@ -52,33 +45,18 @@ export default {
         durationBarVisible: false,
         heightSpec: "BusinessHours",
         height: 5000,
- 
         timeRangeSelectedHandling: "Enabled",
-        eventMoveHandling: "Disabled",
+        eventMoveHandling: "Enabled",
         eventDeleteHandling: "Disabled",
-        eventResizeHandling: "Enabled",
-
+        eventResizeHandling: "Disabled",
         startDate: new Date().toISOString().split("T")[0],
-
         eventClickHandling: "JavaScript",
-
         eventsLoadMethod: "POST",
-
         onTimeRangeSelected: async (args) => {
-          const modal = await DayPilot.Modal.alert("Please select a timeslot");
-          const dp = args.control;
-          dp.clearSelection();
-          if (modal.canceled) {
-            return;
-          }
-
+          this.handleTimeSelectedNotTimeSlot(args);
         },
-
-        eventBooking(event) {
-          const confirmBooking = confirm(`Do you want to book ${event.text}?`);
-          if (confirmBooking) {
-            this.saveBooking(event);
-          }
+        onEventMoved: async (args) => {
+          this.handleTimeSlotMoving(args);
         },
         onEventClicked: (args) => {
           this.eventBooking(args.e);
@@ -108,6 +86,26 @@ export default {
     }
   },
   methods: {
+
+   async handleTimeSelectedNotTimeSlot(args){
+      const modal = await DayPilot.Modal.alert("Please select a timeslot");
+          const dp = args.control;
+          dp.clearSelection();
+          if (modal.canceled) {
+            return;
+          }
+
+    },
+
+    async handleTimeSlotMoving(args){
+      const modal = await DayPilot.Modal.alert("You can't move a timeslot");
+          const dp = args.control;
+          dp.clearSelection();
+          if (modal.canceled) {
+            return;
+          }
+
+    },
     handleDateChangeInNavigator(args) {
     var today = new DayPilot.Date().getDatePart();
           this.config.startDate = args.day;
@@ -179,7 +177,6 @@ export default {
           type:"datetime",
           disabled: false,
           focused: false,
-
         },
         {
           name:"Email",
@@ -271,9 +268,7 @@ export default {
     },
 
     mounted() {
-
       this.fetchTimeSlots();
-
     }
   }
 }
