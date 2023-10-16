@@ -9,7 +9,9 @@ use App\Entity\Booking;
 use App\Entity\TimeSlot;
 use Doctrine\ORM\EntityManagerInterface;
 
-class SearchService{
+class SearchService
+{
+    const DURATION = 'PT30M'; // 30 minutes
     private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager){
@@ -81,7 +83,7 @@ class SearchService{
         $freeTimeSlots = [];
         foreach($period as $date){
             $isFree = true;
-            $endDate = (clone $date)->add(new DateInterval('PT30M'));
+            $endDate = (clone $date)->add(new DateInterval(self::DURATION));
             foreach($bookings as $booking){
                 if($booking->getRoom() == $room){
                     if($date >= $booking->getStartDate() && $date < $booking->getEndDate() || ($endDate > $booking->getStartDate() && $endDate <= $booking->getEndDate())){
@@ -92,7 +94,7 @@ class SearchService{
 
             }
             if($isFree){
-                $timeslot = new TimeSlot($date, (clone $date)->add(new DateInterval('PT30M')));
+                $timeslot = new TimeSlot($date, (clone $date)->add(new DateInterval(self::DURATION)));
                 array_push($freeTimeSlots, $timeslot);
             }
         }
@@ -103,7 +105,7 @@ class SearchService{
     {
         $startDate = (new DateTime($bookingDate))->setTime(8, 0, 0);
         $endDate = (new DateTime($bookingDate))->setTime(20, 0, 0);
-        $interval = new DateInterval('PT30M');
+        $interval = new DateInterval(self::DURATION);
         return new DatePeriod($startDate, $interval, $endDate);
         
     }

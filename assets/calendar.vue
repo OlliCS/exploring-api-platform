@@ -244,20 +244,12 @@ export default {
         }
       });
     },
-
     mounted() {
       this.loadTimeSlots();
     }
   }
 }
 </script>
-
-
-
-
-
-
-
 <style>
 .wrap {
   display: flex;
