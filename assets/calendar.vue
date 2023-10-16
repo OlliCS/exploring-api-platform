@@ -73,7 +73,7 @@ export default {
           this.createErrorModal("You can't move a timeslot",args);
         },
         onEventClicked: (args) => {
-          this.eventBooking(args.e);
+          this.selectTimeSlot(args.e);
         },
       },
     }
@@ -168,7 +168,7 @@ export default {
       this.calendar.update();
     },
     
-    async eventBooking(e) {
+    async selectTimeSlot(e) {
       const form = [
         { 
           name: "Room", 
@@ -187,19 +187,16 @@ export default {
           id: "end",
           type:"datetime",
           disabled: false,
-          focused: false,
         },
         {
           name:"Email",
           id: "email",
-          type:"text",
-          disabled: false,
-          focused: true
+          type:"text"
         }
       ];
 
       const formData = e.data;
-      const modal = await DayPilot.Modal.form(form, formData,{focus:e.data.end});
+      const modal = await DayPilot.Modal.form(form, formData,{focus: "email"});
       if (modal.canceled) {
         return;
       }
