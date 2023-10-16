@@ -5,7 +5,6 @@
       <input class="input" type="number" v-model="people" min="2" max="100" />
       <h2>Select a date:</h2>
       <DayPilotNavigator id="nav" :config="navigatorConfig" />
-
     </div>
     <div class="content">
       <DayPilotCalendar id="dp" :config="config" ref="calendar" />
@@ -39,12 +38,14 @@ export default {
             args.preventDefault();
             alert("Please choose a future date")
             this.config.startDate = today;
-            this.fetchTimeSlots();
             return;
           }
-
-          this.config.startDate = args.day;
+          else{
+            this.config.startDate = args.day;
           this.fetchTimeSlots();
+          }
+
+
         }
       },
       config: {
