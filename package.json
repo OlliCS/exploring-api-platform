@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "@daypilot/daypilot-lite-vue": "^3.18.0",
+        "@daypilot/modal": "^3.17.0",
         "moment": "^2.29.4",
         "vue-number-input-spinner": "^2.2.0"
     }

@@ -939,6 +939,11 @@
   resolved "https://registry.yarnpkg.com/@daypilot/daypilot-lite-vue/-/daypilot-lite-vue-3.18.0.tgz#16bfeeab037566bb370059d2e1069b62550a92d3"
   integrity sha512-OTILe5xgCNqoceNYp1Vjzt2JMJy8CtwTTU/jbrr358gA7OLF77sQKa17RDwlIZVXQx9JgjW8Ga7HCkvuUyEk0w==
 
+"@daypilot/modal@^3.17.0":
+  version "3.17.0"
+  resolved "https://registry.yarnpkg.com/@daypilot/modal/-/modal-3.17.0.tgz#53336a959bfa60fa04968aefac6f68b951ca5bbd"
+  integrity sha512-k3Y07a+v8Oqm3TnbhaxBeh9Vh82hamaWlRegh/nG2I6S4gKZ+ikDcS1rNJv9lN67S0UiBFlf0pyIKamA4+uAow==
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
