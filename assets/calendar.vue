@@ -5,8 +5,14 @@
       <input class="input" type="number" v-model="people" min="2" max="100" />
       <h2>Select a date:</h2>
       <DayPilotNavigator id="nav" :config="navigatorConfig" />
+      
     </div>
     <div class="content">
+      <div>
+        <h1>Available time slots</h1>
+        <p>{{ errorMessage }}</p>
+      </div>
+
       <DayPilotCalendar id="dp" :config="config" ref="calendar" />
     </div>
   </div>
@@ -24,6 +30,7 @@ export default {
   name: 'Calendar',
   data: function () {
     return {
+      errorMessage: "Click on a time slot to book it",
       freeTimeSlots: [],
       people: 2,
       navigatorConfig: {
@@ -33,16 +40,7 @@ export default {
         selectMode: "Day",
         startDate: new Date().toISOString().split("T")[0],
         onTimeRangeSelected: args => {
-          var today = new DayPilot.Date().getDatePart();
-          this.config.startDate = args.day;
-          if (args.start < today) {
-            args.preventDefault();
-            alert("Please choose a future date")
-            return;
-          }
-          else{
-            this.fetchTimeSlots();
-          }
+          this.handleDateChangeInNavigator(args);
         }
       },
       config: {
@@ -114,6 +112,19 @@ export default {
     }
   },
   methods: {
+    handleDateChangeInNavigator(args) {
+    var today = new DayPilot.Date().getDatePart();
+          this.config.startDate = args.day;
+          if (args.start < today) {
+            args.preventDefault();
+            this.errorMessage = "You can't select a day in the past";
+            return;
+          }
+          else{
+            this.errorMessage = "Click on a time slot to book it";
+            this.fetchTimeSlots();
+          }
+        },
     async fetchTimeSlots() {
       try {
         if (this.config.startDate == null) {
@@ -255,10 +266,13 @@ export default {
 <style>
 .wrap {
   display: flex;
+  margin-left: 100px;
+
 }
 
 .left {
-  margin-right: 10px;
+  margin-right: 100px;
+  margin-top: 100px;
 }
 
 .content {
