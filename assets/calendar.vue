@@ -18,6 +18,7 @@
 import { DayPilot, DayPilotCalendar, DayPilotNavigator } from '@daypilot/daypilot-lite-vue'
 import {Modal} from "@daypilot/modal";
 import moment from 'moment'
+import axios from 'axios'
 
 export default {
   name: 'Calendar',
