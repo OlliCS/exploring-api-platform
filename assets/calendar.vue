@@ -5,12 +5,11 @@
       <h2>Meeting organiser</h2>
       <input class="input" type="number" v-model="people" min="2" max="100" />
         <DayPilotNavigator id="nav" :config="navigatorConfig" />
-        <p class="errorMessage">{{errorMessage}}</p>
+
         <p class="message">{{message}}</p>
+        <p class="errorMessage">{{errorMessage}}</p>
+        <p class="message">{{detailMessage}}</p>
 
-
-
-      
     </div>
     <div class="content">
 
@@ -34,6 +33,7 @@ export default {
   data: function () {
     return {
       message: "Select a day ",
+      detailMessage: "",
       errorMessage: "",
       freeTimeSlots: [],
       people: 2,
@@ -59,10 +59,10 @@ export default {
         heightSpec: "BusinessHours",
         height: 5000,
  
-        timeRangeSelectedHandling: "Disabled",
+        timeRangeSelectedHandling: "Enabled",
         eventMoveHandling: "Disabled",
         eventDeleteHandling: "Disabled",
-        eventResizeHandling: "Disabled",
+        eventResizeHandling: "Enabled",
 
         startDate: new Date().toISOString().split("T")[0],
 
@@ -71,7 +71,8 @@ export default {
         eventsLoadMethod: "POST",
 
         onTimeRangeSelected: async (args) => {
-          const modal = await DayPilot.Modal.prompt("Do you want to save this timeslot for a meeting:");
+          //const modal = await DayPilot.Modal.prompt("Do you want to save this timeslot for a meeting:");
+          this.message = "Do you want to save this timeslot for a meeting?"
           const dp = args.control;
           dp.clearSelection();
           if (modal.canceled) {
@@ -125,10 +126,12 @@ export default {
             args.preventDefault();
             this.errorMessage = "You can't select a day in the past";
             this.message = "";
+            this.detailMessage = "";
             return;
           }
           else{
             this.message = "Click on a time slot";
+            this.detailMessage = "";
             this.errorMessage = "";
             this.fetchTimeSlots();
           }
@@ -168,9 +171,9 @@ export default {
       this.calendar.update({ freeTimeSlots });
     },
     async eventBooking(event) {
-      console.log(event.data.id);
-
       const modal = await DayPilot.Modal.prompt(`Do you want to save this timeslot for a meeting: ${event.data.text}`);
+    
+      
 
       if (modal.canceled) {
         return;
@@ -194,18 +197,16 @@ export default {
       if (response.ok) {
         this.fetchTimeSlots();
         this.loadTimeSlots();
-        alert("Booking saved");
-
+        this.errorMessage = "";
+        this.message = "Booking saved";
+        this.detailMessage = `${event.data.text}`
       }
-      else {
-        alert("Booking not saved");
-        console.log("Error booking the slot: " + data);
+      else{
+        this.errorMessage = "Failed saving booking";
+        this.message = "";
+        this.detailMessage = `${response.status}`;
       }
-
       console.log(data);
-
-
-
     },
 
     convertJsonInTimeSlots(data) {
@@ -315,6 +316,8 @@ export default {
 .errorMessage{
   color: red;
 }
+
+
 
 
 
