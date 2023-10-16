@@ -45,7 +45,7 @@ class SearchController extends AbstractController
         $roomId = $requestData['room'];
 
         $room = $this->entityManager->getRepository(Room::class)->find($roomId);
-        //convert the date strings to DateTime objects
+        
         $startDate = new DateTime($start);
         $endDate = new DateTime($end);
 
