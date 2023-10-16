@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Room;
+use App\Entity\User;
 use App\Entity\Booking;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -30,6 +31,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Room', 'fas fa-list', Room::class);
         yield MenuItem::linkToCrud('Booking', 'fas fa-list', Booking::class);
+        yield MenuItem::linkToCrud('User', 'fas fa-list', User::class);
 
     }
 }
