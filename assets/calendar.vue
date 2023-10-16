@@ -2,7 +2,7 @@
   <div class="container">
   <div class="wrap">
     <div class="left">
-      <h2>Meeting organiser</h2>
+      <h2>Meeting scheduler</h2>
       <input class="input" type="number" v-model="people" min="2" max="100" />
         <DayPilotNavigator id="nav" :config="navigatorConfig" />
     </div>
