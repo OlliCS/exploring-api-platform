@@ -107,20 +107,25 @@ export default {
       }
     },
     handleDateChangeInNavigator(args) {
-    var today = new DayPilot.Date().getDatePart();
           this.config.startDate = args.day;
-          if (args.start < today) {
+          if(!this.checkIfSelectedDateInNavigatorIsValid(args.day)){
             args.preventDefault();
-            this.errorMessage = "You can't select a day in the past";
-            return;
-          }
-          if (args.day.dayOfWeek() === 6 || args.day.dayOfWeek() === 0) {
-            args.preventDefault();
-            this.errorMessage = "You can't select a weekend day";
             return;
           }
           this.errorMessage = "";
           this.fetchTimeSlots();
+    },
+    checkIfSelectedDateInNavigatorIsValid(selectedDate){
+      var today = new DayPilot.Date().getDatePart();
+      if (selectedDate < today) {
+        this.errorMessage = "You can't select a day in the past";
+        return false;
+      }
+      if (selectedDate.dayOfWeek() === 6 || selectedDate.dayOfWeek() === 0) {
+        this.errorMessage = "You can't select a weekend day";
+        return false;
+      }
+      return true;
     },
     async fetchTimeSlots() {
       try {
