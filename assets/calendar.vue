@@ -2,7 +2,7 @@
   <div class="wrap">
     <div class="left">
       <h2>How many people ?</h2>
-      <input class="input" type="number" v-model="people" min="2" max="100"/>
+      <input class="input" type="number" v-model="people" min="2" max="100" />
       <h2>Select a date:</h2>
       <DayPilotNavigator id="nav" :config="navigatorConfig" />
 
@@ -13,13 +13,17 @@
   </div>
 </template>
 
+
+
+
+
 <script>
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from '@daypilot/daypilot-lite-vue'
+import { DayPilot, DayPilotCalendar, DayPilotNavigator } from '@daypilot/daypilot-lite-vue'
 import moment from 'moment'
 
 export default {
   name: 'Calendar',
-  data: function() {
+  data: function () {
     return {
       freeTimeSlots: [],
       people: 2,
@@ -31,31 +35,41 @@ export default {
         startDate: new Date().toISOString().split("T")[0],
         onTimeRangeSelected: args => {
           var today = new DayPilot.Date().getDatePart();
-          if(args.start < today) {
+          if (args.start < today) {
             args.preventDefault();
             alert("Please choose a future date")
             this.config.startDate = today;
             this.fetchTimeSlots();
             return;
-          }    
-          
+          }
+
           this.config.startDate = args.day;
           this.fetchTimeSlots();
         }
       },
       config: {
         viewType: "Day",
+        timeFormat: "Clock24Hours",
+        weekStarts: 1, // Monday
         businessBeginsHour: 8,
         businessEndsHour: 20,
-        timeFormat: "Clock24Hours",
-        startDate: new Date().toISOString().split("T")[0],
+        dayBeginsHour: 8,
+        dayEndsHour: 20,
         durationBarVisible: false,
-        eventClickHandling: "JavaScript",
+
         timeRangeSelectedHandling: "Disabled",
-        eventsLoadMethod:"POST",
-        weekStarts: 1,
+        eventMoveHandling: "Disabled",
+        eventDeleteHandling: "Disabled",
+        eventResizeHandling: "Disabled",
+
+        startDate: new Date().toISOString().split("T")[0],
+
+        eventClickHandling: "JavaScript",
+
+        eventsLoadMethod: "POST",
+
         onTimeRangeSelected: async (args) => {
-          const modal = await DayPilot.Modal.prompt("Do you want to save this timeslot for a meeting:", "Event 1");
+          const modal = await DayPilot.Modal.prompt("Do you want to save this timeslot for a meeting:");
           const dp = args.control;
           dp.clearSelection();
           if (modal.canceled) {
@@ -67,25 +81,16 @@ export default {
             id: DayPilot.guid(),
             text: modal.result
           });
+        },
 
-
-        },
-        eventMoveHandling: "Disabled",
-        eventDeleteHandling: "Disabled",
-        onEventMoved: () => {
-          console.log("Event moved");
-        },
-        onEventResized: () => {
-          console.log("Event resized");
-        },
         eventBooking(event) {
-  const confirmBooking = confirm(`Do you want to book ${event.text}?`);
-  if (confirmBooking) {
-    this.saveBooking(event);
-  }
-},
+          const confirmBooking = confirm(`Do you want to book ${event.text}?`);
+          if (confirmBooking) {
+            this.saveBooking(event);
+          }
+        },
         onEventClicked: (args) => {
-        this.eventBooking(args.e);
+          this.eventBooking(args.e);
         },
       },
     }
@@ -106,18 +111,17 @@ export default {
     DayPilotNavigator
   },
   computed: {
-    // DayPilot.Calendar object - https://api.daypilot.org/daypilot-calendar-class/
     calendar() {
       return this.$refs.calendar.control;
     }
   },
   methods: {
-    async fetchTimeSlots(){
-      try{
-        if(this.config.startDate == null){
+    async fetchTimeSlots() {
+      try {
+        if (this.config.startDate == null) {
           this.config.startDate = new Date().toISOString().split("T")[0];
         }
-        const response = await fetch('https://127.0.0.1:8000/api/searches',{
+        const response = await fetch('https://127.0.0.1:8000/api/searches', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -132,74 +136,80 @@ export default {
         this.convertJsonInTimeSlots(data);
         this.loadTimeSlots();
         return data;
-      }catch(err){
+      } catch (err) {
         console.log(err);
-
-
       }
     },
     loadTimeSlots() {
       const freeTimeSlots = this.freeTimeSlots;
-      try{
+      try {
         this.calendar.events.list = freeTimeSlots;
       }
-      catch(err){
+      catch (err) {
         console.log(err);
       }
-      this.calendar.update({freeTimeSlots});
+      this.calendar.update({ freeTimeSlots });
     },
-
-
-    async eventBooking(event)  {
+    async eventBooking(event) {
       console.log(event.data.id);
 
-          const modal = await DayPilot.Modal.prompt(`Do you want to save this timeslot for a meeting: ${event.data.text}`);
+      const modal = await DayPilot.Modal.prompt(`Do you want to save this timeslot for a meeting: ${event.data.text}`);
 
-          if (modal.canceled) {
-            return;
-          }
-          //call api to save event
-          const response = await fetch('https://127.0.0.1:8000/api/bookings',{
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            "startDate": event.data.start,
-            "endDate": event.data.end,
-            "room": "/api/rooms/" + event.data.id,
-          })
-        });
-
-        const data = await response.json();
-        
-        fetchTimeSlots();
-        console.log(data);
-
-
-
+      if (modal.canceled) {
+        return;
+      }
+      //call api to save event
+      const response = await fetch('https://127.0.0.1:8000/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
+        body: JSON.stringify({
+          "startDate": event.data.start,
+          "endDate": event.data.end,
+          "room": "/api/rooms/" + event.data.id,
+        })
+      });
 
-    convertJsonInTimeSlots(data){
+      const data = await response.json();
+
+      if (response.ok) {
+        this.fetchTimeSlots();
+        this.loadTimeSlots();
+        alert("Booking saved");
+
+      }
+      else {
+        alert("Booking not saved");
+        console.log("Error booking the slot: " + data);
+      }
+
+      console.log(data);
+
+
+
+    },
+
+    convertJsonInTimeSlots(data) {
       const colors = [
         // Greens
         "#CCFFCC", // Very light green
         "#99FF99", // Light green
         "#66FF66", // Slightly dark light green
-        
+
         // Blues
         "#CCFFFF", // Very light blue
         "#99FFFF", // Light blue
         "#66FFFF", // Slightly dark light blue
-        ];
-    this.freeTimeSlots = [];
-    // Iterate over each room and its index
-    data.forEach((roomData, roomIndex) => {
+      ];
+      this.freeTimeSlots = [];
+      // Iterate over each room and its index
+      data.forEach((roomData, roomIndex) => {
         // Safe-checks for data structure
-        if(!roomData.room || !roomData.slots) {
-            console.error("Invalid data structure:", roomData);
-            return;  // Skip this iteration if the data structure is not as expected
+        if (!roomData.room || !roomData.slots) {
+          console.error("Invalid data structure:", roomData);
+          return;  // Skip this iteration if the data structure is not as expected
         }
 
         const room = roomData.room;
@@ -208,38 +218,42 @@ export default {
         const color = colors[roomIndex % colors.length];
 
         // Iterating through each time slot
-        for(let timeSlot of slots){
-            // Ensure date parsing
-            let startHour = moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('HH:mm');
-            let endHour = moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('HH:mm');
-            
-            // Constructing the event object
-            let e = {
-                id: room.id,
-                start: moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
-                end: moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
-                text: room.name + " ("+ room.capacity + ")\t " + startHour + " -  " + endHour,
-                backColor: color,
-            }
-            this.freeTimeSlots.push(e);
+        for (let timeSlot of slots) {
+          // Ensure date parsing
+          let startHour = moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('HH:mm');
+          let endHour = moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('HH:mm');
+
+          // Constructing the event object
+          let e = {
+            id: room.id,
+            start: moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
+            end: moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
+            text: room.name + " (" + room.capacity + ")\t " + startHour + " -  " + endHour,
+            backColor: color,
+          }
+          this.freeTimeSlots.push(e);
         }
-    });
+      });
 
-    this.loadTimeSlots();
+      this.loadTimeSlots();
 
-},
+    },
 
+    mounted() {
 
+      this.fetchTimeSlots();
 
-
-
-  mounted() {
-
-    this.fetchTimeSlots();
-
-  }}
+    }
+  }
 }
 </script>
+
+
+
+
+
+
+
 <style>
 .wrap {
   display: flex;
@@ -260,7 +274,6 @@ export default {
   padding: 5px;
   font-size: 16px;
 }
-
 
 .calendar_default_event_inner {
   background: #2e78d6;
