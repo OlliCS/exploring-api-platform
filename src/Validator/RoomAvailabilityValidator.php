@@ -37,12 +37,12 @@ class RoomAvailabilityValidator {
     private function validateHourConflictsWithExistingBookings() : RoomAvailabilityResponse
     {
         foreach($this->bookings as $booking) {
-            if($this->startDate >= $booking->getStartDate() && $this->startDate <= $booking->getEndDate()) {
+            if($this->startDate >= $booking->getStartDate() && $this->startDate < $booking->getEndDate()) {
                 return new RoomAvailabilityResponse(
                     false,
                     "The start date {$this->startDate->format(self::DATEFORMAT)} is in the range of another booking, {$this->createMessageOfConflictingBooking($booking)}");
             }
-            if($this->endDate >= $booking->getStartDate() && $this->endDate <= $booking->getEndDate()) {
+            if($this->endDate > $booking->getStartDate() && $this->endDate <= $booking->getEndDate()) {
                 return new RoomAvailabilityResponse(
                     false,
                     "The end date {$this->endDate->format(self::DATEFORMAT)} is in the range of another booking, {$this->createMessageOfConflictingBooking($booking)}");
