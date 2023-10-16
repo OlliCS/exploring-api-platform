@@ -12,12 +12,16 @@ class LoginController extends AbstractController
     #[Route('/login', name: 'app_login')]
     public function index(AuthenticationUtils $authenticationUtils): Response
     {
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return $this->render('login/index.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error,
-        ]);
+        return $this->render('login/index.html.twig',[
+            'error' => $authenticationUtils->getLastAuthenticationError(),
+            'username_label' => 'Email',
+            'password_label' => 'Password',
+            'sign_in_label' => 'Log in',
+            'forgot_password_enabled' => false,
+            'csrf_token_intention' => 'authenticate',
+            'username_parameter' => 'email',
+            'target_path' => $this->generateUrl('app_login'),
+            'translation_domain' => 'admin',
+            'password_parameter' => 'password',]);
     }
 }

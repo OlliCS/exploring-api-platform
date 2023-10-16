@@ -1,20 +1,43 @@
-{% extends 'base.html.twig' %}
+{% extends '@EasyAdmin/page/login.html.twig' %}
+{# {% extends 'base.html.twig' %} #}
 
-{% block title %}Hello LoginController!{% endblock %}
+{% block title %}Log In!{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container">
+    <div class="row">
+        <div class="login-form bg-light mt-4 p-4">
+            <form method="post" class="row g-3">
+                <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/Users/Olivier/Desktop/api platform/exploring-api-platform/src/Controller/LoginController.php'|file_link(0) }}">src/Controller/LoginController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/Users/Olivier/Desktop/api platform/exploring-api-platform/templates/login/index.html.twig'|file_link(0) }}">templates/login/index.html.twig</a></code></li>
-    </ul>
+                {# {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey }}</div>
+                {% endif %} #}
+
+                <div class="col-12">
+                    <label for="inputEmail">Email</label>
+                    <input type="email" name="email" id="inputEmail" class="form-control" required autofocus>
+                </div>
+                <div class="col-12">
+                    <label for="inputPassword">Password</label>
+                    <input type="password" name="password" id="inputPassword" class="form-control" required>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"> 
+
+
+
+                <div class="col-12">
+                    <button type="submit">
+                        Sign in
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
