@@ -192,7 +192,8 @@ export default {
         {
           name:"Email",
           id: "email",
-          type:"text"
+          type:"text",
+          required: false,
         }
       ];
 
@@ -232,33 +233,25 @@ export default {
       console.log(data);
     },
 
-    convertApiResponseInTimeSlots(data) {
-
-      this.freeTimeSlots = [];
-      // Iterate over each room and its index
-      data.forEach((roomData, roomIndex) => {
-        // Safe-checks for data structure
-        if (!roomData.room || !roomData.slots) {
-          console.error("Invalid data structure:", roomData);
-          return;  // Skip this iteration if the data structure is not as expected
+    convertApiResponseInTimeSlots(roomDataList) {
+      roomDataList.forEach((singleRoomData, index) => {
+        if (!singleRoomData.room || !singleRoomData.slots) {
+          console.error("Invalid data structure:", singleRoomData);
+          return;  
         }
+        const roomDetails = singleRoomData.room;
+        const availableSlots = singleRoomData.slots;
+        const roomColor = this.colors[index % this.colors.length];
 
-        const room = roomData.room;
-        const slots = roomData.slots;
-
-        const color = this.colors[roomIndex % this.colors.length];
-
-        // Iterating through each time slot
-        for (let timeSlot of slots) {
-          // Constructing the event object
-          let e = {
-            id: room.id,
-            start: moment(timeSlot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
-            end: moment(timeSlot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
-            text: room.name + " (" + room.capacity + ")",
-            backColor: color,
+        for (let slot of availableSlots) {
+          let timeSlot = {
+            id: roomDetails.id,
+            start: moment(slot.startDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
+            end: moment(slot.endDate, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss'),
+            text: `${roomDetails.name} ( ${roomDetails.capacity} )`,
+            backColor: roomColor,
           }
-          this.timeSlots.push(e);
+          this.timeSlots.push(timeSlot);
         }
       });
     },
