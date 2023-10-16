@@ -5,6 +5,7 @@
       <h2>Meeting scheduler</h2>
       <input class="input" type="number" v-model="people" min="2" max="100" />
         <DayPilotNavigator id="nav" :config="navigatorConfig" />
+        <p class="errorMessage">{{errorMessage}}</p>
     </div>
     <div class="content">
         <DayPilotCalendar id="dp" :config="config" ref="calendar" />
@@ -24,6 +25,7 @@ export default {
     return {
       freeTimeSlots: [],
       people: 2,
+      errorMessage: "",
       navigatorConfig: {
         showMonths: 1,
         skipMonths: 1,
@@ -69,7 +71,6 @@ export default {
       if (newVal !== oldVal) {
         console.log("Number input changed to:", newVal);
         this.fetchTimeSlots();
-
       }
     }
   },
@@ -86,7 +87,6 @@ export default {
     }
   },
   methods: {
-
    async handleTimeSelectedNotTimeSlot(args){
       const modal = await DayPilot.Modal.alert("Please select a timeslot");
           const dp = args.control;
@@ -94,9 +94,7 @@ export default {
           if (modal.canceled) {
             return;
           }
-
     },
-
     async handleTimeSlotMoving(args){
       const modal = await DayPilot.Modal.alert("You can't move a timeslot");
           const dp = args.control;
@@ -104,7 +102,6 @@ export default {
           if (modal.canceled) {
             return;
           }
-
     },
     handleDateChangeInNavigator(args) {
     var today = new DayPilot.Date().getDatePart();
@@ -112,17 +109,18 @@ export default {
           if (args.start < today) {
             args.preventDefault();
             this.errorMessage = "You can't select a day in the past";
-            this.message = "";
-            this.detailMessage = "";
             return;
           }
-          else{
-            this.message = "Click on a time slot";
-            this.detailMessage = "";
-            this.errorMessage = "";
-            this.fetchTimeSlots();
+
+          if (args.day.dayOfWeek() === 6 || args.day.dayOfWeek() === 0) {
+            args.preventDefault();
+            this.errorMessage = "You can't select a weekend day";
+            return;
           }
-        },
+
+          this.errorMessage = "";
+          this.fetchTimeSlots();
+    },
     async fetchTimeSlots() {
       try {
         if (this.config.startDate == null) {
