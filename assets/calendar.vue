@@ -2,19 +2,20 @@
   <div class="container">
   <div class="wrap">
     <div class="left">
-      <h2>How many people ?</h2>
+      <h2>Meeting organiser</h2>
       <input class="input" type="number" v-model="people" min="2" max="100" />
-      <h2>Select a date:</h2>
-      <DayPilotNavigator id="nav" :config="navigatorConfig" />
+        <DayPilotNavigator id="nav" :config="navigatorConfig" />
+        <p class="errorMessage">{{errorMessage}}</p>
+        <p class="message">{{message}}</p>
+
+
+
       
     </div>
     <div class="content">
-      <div>
-        <h1>Available time slots</h1>
-        <p>{{ errorMessage }}</p>
-      </div>
 
-      <DayPilotCalendar id="dp" :config="config" ref="calendar" />
+        <DayPilotCalendar id="dp" :config="config" ref="calendar" />
+
     </div>
   </div>
 </div>
@@ -32,7 +33,8 @@ export default {
   name: 'Calendar',
   data: function () {
     return {
-      errorMessage: "Click on a time slot to book it",
+      message: "Select a day ",
+      errorMessage: "",
       freeTimeSlots: [],
       people: 2,
       navigatorConfig: {
@@ -55,6 +57,7 @@ export default {
         dayEndsHour: 20,
         durationBarVisible: false,
         heightSpec: "BusinessHours",
+        height: 5000,
  
         timeRangeSelectedHandling: "Disabled",
         eventMoveHandling: "Disabled",
@@ -121,10 +124,12 @@ export default {
           if (args.start < today) {
             args.preventDefault();
             this.errorMessage = "You can't select a day in the past";
+            this.message = "";
             return;
           }
           else{
-            this.errorMessage = "Click on a time slot to book it";
+            this.message = "Click on a time slot";
+            this.errorMessage = "";
             this.fetchTimeSlots();
           }
         },
@@ -288,6 +293,7 @@ export default {
   box-sizing: border-box;
   padding: 5px;
   font-size: 16px;
+  margin-bottom: 10px;
 }
 
 .calendar_default_event_inner {
@@ -298,12 +304,16 @@ export default {
 }
 
 .container{
-  height: 100vh;
+  height: 200vh;
   overflow: hidden;
-  position: absolute;
+  position: fixed;
   top: 0;
 
   
+}
+
+.errorMessage{
+  color: red;
 }
 
 
