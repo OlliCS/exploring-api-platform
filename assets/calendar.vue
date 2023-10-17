@@ -190,16 +190,13 @@ export default {
           id: "end",
           type:"datetime",
           disabled: false,
+          focus: false
         },
-        {
-          name:"Email",
-          id: "email",
-          type:"text",
-          required: false,
-        }
+
+
       ];
       const bookingFormData = e.data;
-      const modal = await DayPilot.Modal.form(bookingform, bookingFormData,{focus: "email"});
+      const modal = await DayPilot.Modal.form(bookingform, bookingFormData,{focus: "room"});
       if (modal.canceled || !modal.result) {
         return;
       }
