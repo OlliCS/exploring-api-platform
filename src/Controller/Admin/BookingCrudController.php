@@ -33,7 +33,7 @@ class BookingCrudController extends AbstractCrudController
     public function createEntity(string $entityFqcn)
     {
         $timezone = new DateTimeZone('Europe/Amsterdam');
-        $booking = new Booking(new DateTime(null, $timezone),new DateTime(null, $timezone),null);
+        $booking = new Booking(new DateTime(null, $timezone),new DateTime(null, $timezone),null,null);
         return $booking;
 
     }
@@ -42,7 +42,9 @@ class BookingCrudController extends AbstractCrudController
         $bookingResponse = $this->bookingService->createBooking(
             $entityInstance->getRoom(),
             $entityInstance->getStartDate(),
-            $entityInstance->getEndDate()
+            $entityInstance->getEndDate(),
+            $entityInstance->getUser()
+
         );
 
         if (!$bookingResponse->isSuccess()) {
@@ -54,12 +56,12 @@ class BookingCrudController extends AbstractCrudController
     }
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')->hideOnForm();
+        yield IdField::new('id')->hideOnForm()->hideOnIndex();
         yield DateTimeField::new('startDate')->setColumns(8)
         ->setFormat('dd/MM/yyy HH:mm ');
         yield DateTimeField::new('endDate')->setColumns(8)
         ->setFormat('HH:mm ');
-        yield AssociationField::new('user')->setColumns(8)->setTemplatePath('admin/booking_user.html.twig');
+        yield AssociationField::new('user')->setColumns(8)->setTemplatePath('admin/booking_user.html.twig')->hideOnForm();
 
 
         yield AssociationField::new('room')->setColumns(8);
