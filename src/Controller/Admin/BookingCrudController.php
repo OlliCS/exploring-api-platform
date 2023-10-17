@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -71,11 +72,28 @@ class BookingCrudController extends AbstractCrudController
     }
 
     public function configureActions(Actions $actions): Actions {
+       $bookingToday = Action::new('bookingToday') 
+            ->setLabel('bookingToday')
+            ->setIcon('fa fa-calendar')
+            ->createAsGlobalAction()
+            ->linkToRoute('today_bookings');
+       
         return parent::configureActions($actions)
         ->setPermission(Action::DELETE,'ROLE_ADMIN')
-        ->disable(Action::NEW);
+        ->disable(Action::NEW)
+        ->add(Crud::PAGE_INDEX, $bookingToday);
+    }
+
+    public function configureFilters(Filters $filters):Filters{
+        return parent::configureFilters($filters)
+        ->add('room')
+        ->add('user')
+        ->add('startDate')
+        ->add('endDate');
         
 
     }
+
+
     
 }
