@@ -16,7 +16,7 @@ class RoomAvailabilityValidator {
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
-        $this->bookings = $existingBookings;
+        $this->existingBookings = $existingBookings;
     }
 
     public function validate() : RoomAvailabilityResponse

@@ -37,6 +37,9 @@ class TimeValidator
         ];
 
         foreach ($validations as $validation) {
+            if (!method_exists($this, $validation)) {
+                throw new \LogicException("Validation method {$validation} does not exist.");
+            }
             $validationResponse = $this->$validation();
             if (!$validationResponse->isSuccess()) {
                 return $validationResponse;
