@@ -8,7 +8,9 @@ use DateTimeZone;
 use App\Entity\Booking;
 use App\Service\BookingService;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -66,6 +68,14 @@ class BookingCrudController extends AbstractCrudController
 
         yield AssociationField::new('room')->setColumns(8);
         yield TextField::new('duration')->setColumns(8)->hideOnForm();
+    }
+
+    public function configureActions(Actions $actions): Actions {
+        return parent::configureActions($actions)
+        ->setPermission(Action::DELETE,'ROLE_ADMIN')
+        ->disable(Action::NEW);
+        
+
     }
     
 }

@@ -3,7 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Room;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -43,6 +45,14 @@ class RoomCrudController extends AbstractCrudController
         yield TextField::new('name')->setColumns(8);
         yield IntegerField::new('capacity')->setColumns(8);
         yield AssociationField::new('bookings')->setColumns(8)->hideOnForm();
+
+    }
+
+    public function configureActions(Actions $actions): Actions {
+        return parent::configureActions($actions)
+        ->setPermission(Action::DELETE,'ROLE_ADMIN')
+        ->setPermission(Action::EDIT,'ROLE_ADMIN')
+        ->setPermission(Action::NEW,'ROLE_ADMIN');
 
     }
 }
