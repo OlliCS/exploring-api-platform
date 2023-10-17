@@ -59,6 +59,8 @@ class BookingCrudController extends AbstractCrudController
         ->setFormat('dd/MM/yyy HH:mm ');
         yield DateTimeField::new('endDate')->setColumns(8)
         ->setFormat('HH:mm ');
+        yield AssociationField::new('user')->setColumns(8)->setTemplatePath('admin/booking_user.html.twig');
+
 
         yield AssociationField::new('room')->setColumns(8);
         yield TextField::new('duration')->setColumns(8)->hideOnForm();
