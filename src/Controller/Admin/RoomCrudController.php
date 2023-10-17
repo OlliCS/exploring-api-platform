@@ -39,7 +39,7 @@ class RoomCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')->hideOnForm();
+        yield IdField::new('id')->hideOnForm()->hideOnIndex();
         yield TextField::new('name')->setColumns(8);
         yield IntegerField::new('capacity')->setColumns(8);
         yield AssociationField::new('bookings')->setColumns(8)->hideOnForm();

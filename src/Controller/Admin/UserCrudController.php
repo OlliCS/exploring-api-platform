@@ -20,9 +20,9 @@ class UserCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->hideOnForm();
         yield TextField::new('email');
-        yield TextField::new('password');
+        yield TextField::new('password')->onlyOnForms();
         yield ArrayField::new('roles')->onlyOnForms();
-        yield AssociationField::new('bookings');
+        yield AssociationField::new('bookings')->hideOnForm();
 
     }
 
