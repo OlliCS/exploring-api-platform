@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use App\Entity\User;
 use DateTimeInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
@@ -81,11 +82,12 @@ class Booking
     private ?User $user = null;
 
 
-    public function __construct($startDate,$endDate,$room)
+    public function __construct($startDate,$endDate,$room,$user)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->room = $room;
+        $this->user = $user;
 
     }
 

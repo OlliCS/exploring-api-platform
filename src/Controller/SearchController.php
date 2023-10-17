@@ -53,7 +53,8 @@ class SearchController extends AbstractController
         $user = $this->getUser();
 
 
-        $bookingResponse = $this->bookingService->createBooking($room,$startDate, $endDate);
+
+        $bookingResponse = $this->bookingService->createBooking($room,$startDate, $endDate,$user);
 
         return $this->json($bookingResponse);
     }

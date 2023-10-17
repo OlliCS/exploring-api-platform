@@ -24,7 +24,7 @@ class BookingService
         $this->entityManager = $entityManager;
     }
 
-    public function createBooking(Room $room, DateTime $startDate, DateTime $endDate): BookingResponse
+    public function createBooking(Room $room, DateTime $startDate, DateTime $endDate,$user): BookingResponse
     {
         try {
             $roomIsAvailable = $this->checkRoomAvailability($room, $startDate, $endDate);
@@ -32,7 +32,7 @@ class BookingService
                 return new BookingResponse(null, false, $roomIsAvailable->getMessage());
             }
 
-            $booking = new Booking($startDate, $endDate, $room);
+            $booking = new Booking($startDate, $endDate, $room,$user);
             $this->entityManager->persist($booking);
             $this->entityManager->flush();
             return new BookingResponse($booking, true, 'The booking has been created.');
