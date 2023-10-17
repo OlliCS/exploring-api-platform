@@ -92,5 +92,8 @@ class LoginFormAuthenticator extends AbstractAuthenticator implements  Authentic
         *
         * For more details, see https://symfony.com/doc/current/security/experimental_authenticators.html#configuring-the-authentication-entry-point
         */
+
+         return new RedirectResponse(
+              $this->router->generate('app_login'));
    }
 }
