@@ -33,5 +33,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Booking', 'fas fa-list', Booking::class);
         yield MenuItem::linkToCrud('User', 'fas fa-list', User::class);
 
+        yield MenuItem::linkToRoute('Meeting Scheduler', 'fas fa-list', 'app_calendar');
+
     }
 }
