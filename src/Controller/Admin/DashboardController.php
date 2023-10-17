@@ -23,17 +23,23 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Booking System');
+            ->setTitle('BookingSystem');
     }
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Room', 'fas fa-list', Room::class);
-        yield MenuItem::linkToCrud('Booking', 'fas fa-list', Booking::class);
-        yield MenuItem::linkToCrud('User', 'fas fa-list', User::class);
+        // yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        yield MenuItem::section('Meeting Rooms');
+        yield MenuItem::linkToCrud('Rooms', 'fas fa-list', Room::class);
+        yield MenuItem::section('Bookings');
+        yield MenuItem::linkToRoute('Create New', 'fas fa-calendar', 'app_calendar');
+        yield MenuItem::linkToCrud('Bookings', 'fas fa-handshake', Booking::class);
 
-        yield MenuItem::linkToRoute('Meeting Scheduler', 'fas fa-list', 'app_calendar');
+        yield MenuItem::section('Users');
+        yield MenuItem::linkToCrud('User', 'fas fa-user', User::class);
+
+
+
 
     }
 }
