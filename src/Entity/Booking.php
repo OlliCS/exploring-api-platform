@@ -77,6 +77,9 @@ class Booking
     #[Groups(['booking:read'])]
     private ?string $duration = null;
 
+    #[ORM\ManyToOne(inversedBy: 'bookings')]
+    private ?User $user = null;
+
 
     public function __construct($startDate,$endDate,$room)
     {
@@ -136,6 +139,18 @@ class Booking
     public function __toString(): string
     {
         return $this->getRoom()->getName();
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
     }
 
 
